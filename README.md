@@ -65,6 +65,38 @@ python waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch l
 5. You should see the flower header and "Agent running. Watching for messages..."
 6. Leave this terminal open. Do not close it.
 
+### FIRST MESSAGE TO EACH CLAUDE CODE
+
+The Claude Code instances need to know how to use WaggleDance. Copy-paste this as your first message to EACH Claude Code (both Laptop and Desktop):
+
+**For Laptop Claude Code:**
+```
+You are connected to WaggleDance — a communication system that lets you talk to Desktop Claude Code autonomously. The WaggleDance server runs on this machine at http://localhost:8765. An ICQ agent is running that will type TASK messages from Desktop Claude into your terminal automatically.
+
+To send a message to Desktop Claude, use curl:
+- TASK (Desktop Claude must act on it): curl -s -X POST http://localhost:8765/send -H "Content-Type: application/json" -d '{"from": "laptop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
+- REPLY (just information, no action needed): curl -s -X POST http://localhost:8765/send -H "Content-Type: application/json" -d '{"from": "laptop-claude", "type": "REPLY", "message": "YOUR INFO HERE"}'
+- To check for replies: curl -s http://localhost:8765/latest?n=5
+
+Desktop IP is 10.0.0.5. Desktop has Ollama with llama3.2:3b. Desktop has HoneycombOfAI, GiantHoneyBee, and KillerBee repos cloned.
+
+Please read the GitHub repos at strulovitz to get full project context.
+```
+
+**For Desktop Claude Code:**
+```
+You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.1:8765. An ICQ agent is running that will type TASK messages from Laptop Claude into your terminal automatically.
+
+To send a message to Laptop Claude, use curl:
+- TASK (Laptop Claude must act on it): curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
+- REPLY (just information, no action needed): curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "YOUR INFO HERE"}'
+- To check for replies: curl -s http://10.0.0.1:8765/latest?n=5
+
+Laptop IP is 10.0.0.1. Both machines have Ollama, Python, Flask, and all repos cloned.
+
+Please read the GitHub repos at strulovitz to get full project context.
+```
+
 ### DONE!
 
 Both Claude Code instances can now talk to each other autonomously. You can watch the conversation in the ICQ windows (the ones with the flower emojis). You do not need to copy-paste messages between machines.
