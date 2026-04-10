@@ -201,21 +201,33 @@ def send_message(server_url, name, message, msg_type="REPLY"):
         print_error(f"Send failed: {e}")
 
 
-def find_claude_window(hint=None):
-    try:
-        for w in gw.getAllWindows():
-            title = w.title.lower()
-            if hint and hint.lower() in title:
-                return w
-            # Exclude our own ICQ window by checking for waggle_icq in the title
-            # But do NOT exclude windows that just mention "waggle" in conversation
-            if "waggle_icq" in title:
-                continue
-            if any(kw in title for kw in ["claude", "terminal", "cmd", "powershell", "bash", "windows terminal"]):
-                return w
-    except:
-        pass
-    return None
+def pick_claude_window():
+    """Show numbered list of windows. User picks once, then fully autonomous."""
+    windows = []
+    for w in gw.getAllWindows():
+        t = w.title.strip()
+        if t and w.visible and "waggle_icq" not in t.lower():
+            windows.append(w)
+
+    print_system("Which window is Claude Code? Pick a number:\n")
+    for i, w in enumerate(windows):
+        print(f"    {CYAN}{i+1}.{RESET} {w.title[:75]}")
+    print()
+
+    while True:
+        try:
+            choice = int(input(f"  {GREEN}>{RESET} "))
+            if 1 <= choice <= len(windows):
+                chosen = windows[choice - 1]
+                print_system(f"Locked onto: '{chosen.title[:60]}'")
+                print_system("Window title may change — tracking by handle, not title.")
+                print()
+                return chosen
+            print_error("Invalid number. Try again.")
+        except ValueError:
+            print_error("Type a number. Try again.")
+        except KeyboardInterrupt:
+            return None
 
 
 def type_into_claude(window, message):
@@ -241,7 +253,6 @@ def main():
     parser.add_argument("--me", required=True, help="Your identity (e.g. laptop-claude)")
     parser.add_argument("--watch", required=True, help="Who to watch (e.g. desktop-claude)")
     parser.add_argument("--interval", type=int, default=5, help="Poll interval seconds (default: 5)")
-    parser.add_argument("--window", default=None, help="Window title hint for Claude Code terminal")
     args = parser.parse_args()
 
     waggle_dir = os.path.dirname(os.path.abspath(__file__))
@@ -260,12 +271,10 @@ def main():
     print_system(f"Log file: {log_filename}")
     print()
 
-    # Find Claude Code window
-    claude_window = find_claude_window(args.window)
-    if claude_window:
-        print_system(f"Found Claude Code window: '{claude_window.title}'")
-    else:
-        print_system("Claude Code window not found yet — will retry on each TASK")
+    # Pick Claude Code window — one time, then autonomous
+    claude_window = pick_claude_window()
+    if not claude_window:
+        print_error("No window selected. Agent will display only, not type.")
     print()
 
     # Load existing messages and display them
@@ -319,10 +328,6 @@ def main():
                         chain_count = 0
                         chain_paused = False
                         print_system("Chain reset. Continuing...")
-
-                    # Find window again if needed
-                    if not claude_window or not claude_window.visible:
-                        claude_window = find_claude_window(args.window)
 
                     if claude_window:
                         success = type_into_claude(claude_window, msg["message"])
