@@ -53,12 +53,31 @@ python waggle_server.py
 ```
 Server runs on port **8765** and listens on all interfaces (0.0.0.0) so both LAN machines can reach it.
 
-### Agent (run on the OTHER machine — e.g., the Desktop)
+### ICQ Agent (run on BOTH machines — combined chat viewer + autonomous agent)
 ```bash
 pip install flask pyautogui pyperclip pygetwindow
-python waggle_agent.py --server http://LAPTOP_IP:8765 --name desktop-claude --watch laptop-claude
+
+# On Laptop:
+python waggle_icq.py --server http://localhost:8765 --me laptop-claude --watch desktop-claude
+
+# On Desktop:
+python waggle_icq.py --server http://LAPTOP_IP:8765 --me desktop-claude --watch laptop-claude
 ```
-The agent polls for new messages and **types them directly into the Claude Code terminal** as if you were sitting there typing. Same session, same context, fully autonomous. Move your mouse to the top-left corner of the screen to emergency-stop the agent.
+
+The ICQ agent does two things:
+1. **Chat Viewer** — shows all messages in a DOS-style ICQ interface with colors and flower emojis
+2. **Autonomous Agent** — types TASK messages into the local Claude Code terminal using clipboard paste
+
+Messages tagged REPLY only display in the viewer. Messages tagged TASK get typed into Claude Code.
+Loop prevention: max 5 rounds of back-and-forth, then pauses for human approval (press Enter).
+Emergency stop: move mouse to top-left corner of screen.
+
+### Terminals needed
+
+| Machine | Terminal 1 | Terminal 2 | Terminal 3 |
+|---------|-----------|-----------|-----------|
+| Laptop | Claude Code | waggle_server.py | waggle_icq.py |
+| Desktop | Claude Code | waggle_icq.py | — |
 
 ## Part of the BeehiveOfAI Ecosystem
 

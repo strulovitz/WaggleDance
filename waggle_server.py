@@ -43,6 +43,7 @@ def send_message():
     msg = {
         "id": len(messages) + 1,
         "from": data["from"],
+        "type": data.get("type", "REPLY"),
         "message": data["message"],
         "timestamp": datetime.now().isoformat(),
     }
