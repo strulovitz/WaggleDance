@@ -6,78 +6,198 @@
 
 ---
 
+## Nir's Daily Startup Guide — Step by Step
+
+**Do this every morning. Follow the order exactly.**
+
+### LAPTOP (do this first)
+
+**Terminal 1 — WaggleDance Server:**
+1. Open a terminal window
+2. Run this command:
+```
+cd C:\Users\nir_s\Projects\WaggleDance
+```
+3. Run this command:
+```
+python waggle_server.py
+```
+4. You should see "WaggleDance server starting on port 8765..."
+5. Leave this terminal open. Do not close it.
+
+**Terminal 2 — Claude Code:**
+1. Open a second terminal window
+2. Start Claude Code as you normally do
+3. Leave this terminal open. Do not close it.
+
+**Terminal 3 — ICQ Chat Viewer + Agent:**
+1. Open a third terminal window
+2. Run this command:
+```
+cd C:\Users\nir_s\Projects\WaggleDance
+```
+3. Run this command:
+```
+python waggle_icq.py --server http://localhost:8765 --me laptop-claude --watch desktop-claude
+```
+4. It will show a numbered list of windows. Type the NUMBER of the Claude Code window (from Terminal 2) and press Enter.
+5. You should see the flower header and "Agent running. Watching for messages..."
+6. Leave this terminal open. Do not close it.
+
+### DESKTOP (do this second)
+
+**Terminal 1 — Claude Code:**
+1. Open a terminal window
+2. Start Claude Code as you normally do
+3. Leave this terminal open. Do not close it.
+
+**Terminal 2 — ICQ Chat Viewer + Agent:**
+1. Open a second terminal window
+2. Run this command:
+```
+cd C:\Users\nir_s\Projects\WaggleDance
+```
+3. Run this command:
+```
+python waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch laptop-claude
+```
+4. It will show a numbered list of windows. Type the NUMBER of the Claude Code window (from Terminal 1) and press Enter.
+5. You should see the flower header and "Agent running. Watching for messages..."
+6. Leave this terminal open. Do not close it.
+
+### DONE!
+
+Both Claude Code instances can now talk to each other autonomously. You can watch the conversation in the ICQ windows (the ones with the flower emojis). You do not need to copy-paste messages between machines.
+
+---
+
+## One-Time Setup (already done — only repeat on a new machine)
+
+### Prerequisites
+```
+pip install flask pyautogui pyperclip pygetwindow
+```
+
+### Firewall Rules (run in admin terminal, one-time)
+On Laptop:
+```
+netsh advfirewall firewall add rule name="WaggleDance" dir=in action=allow protocol=TCP localport=8765
+```
+```
+netsh advfirewall firewall add rule name="RajaBee" dir=in action=allow protocol=TCP localport=5000
+```
+
+On Desktop:
+```
+netsh advfirewall firewall add rule name="WaggleDance" dir=in action=allow protocol=TCP localport=8765
+```
+```
+netsh advfirewall firewall add rule name="QueenBee5001" dir=in action=allow protocol=TCP localport=5001
+```
+```
+netsh advfirewall firewall add rule name="QueenBee5002" dir=in action=allow protocol=TCP localport=5002
+```
+```
+netsh advfirewall firewall add rule name="OllamaLAN" dir=in action=allow protocol=TCP localport=11434
+```
+
+### OLLAMA_HOST Environment Variable (one-time, both machines)
+1. Press Windows key, type "environment", click "Edit the system environment variables"
+2. Click "Environment Variables..." button
+3. Under System variables, click "New..."
+4. Name: `OLLAMA_HOST`  Value: `0.0.0.0`
+5. OK, OK, OK
+6. Restart Ollama (right-click system tray icon > Quit, then reopen)
+
+### Network Info
+- Laptop IP: 10.0.0.1
+- Desktop IP: 10.0.0.5
+- WaggleDance server port: 8765
+
+---
+
 ## What Is This?
 
 Named after the [waggle dance](https://en.wikipedia.org/wiki/Waggle_dance) — the figure-eight dance that honeybees perform to communicate the direction, distance, and quality of a resource to their hive-mates — this is a tiny Flask server that lets two Claude Code instances (one on Laptop, one on Desktop) talk to each other in real time.
 
 Think of it as Skype for AI assistants. Except they only need text. And they never go off-topic. And they actually get work done.
 
-## Why?
-
-The BeehiveOfAI ecosystem spans multiple repositories (KillerBee, GiantHoneyBee, HoneycombOfAI) and needs to be tested across two physical machines on the same LAN. Each machine has its own Claude Code instance (both running Claude Opus 4.6). Rather than using Nir as a human relay — copying messages back and forth — we gave them their own channel.
-
 ## How It Works
 
-1. Run the server on one machine (e.g., the Desktop)
-2. Both Claude Code instances send/receive messages via simple HTTP calls
-3. Messages are persisted to `messages.json` so nothing is lost
+Three components:
 
-### Endpoints
+1. **waggle_server.py** — Flask server that stores messages. Runs on Laptop port 8765.
+2. **waggle_icq.py** — Combined ICQ chat viewer + autonomous agent. Runs on BOTH machines.
+   - Shows all messages in a colored DOS-style chat (yellow = Laptop, magenta = Desktop)
+   - Flower emojis: 🌼 Laptop Windows, 🌷 Desktop Windows (🌻 and 🌹 on Linux)
+   - TASK messages get typed into the local Claude Code terminal automatically
+   - REPLY messages only display in the viewer (no typing)
+3. **messages.json** — All messages persisted to disk
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/send` | Send a message: `{"from": "laptop", "message": "text"}` |
-| GET | `/read` | Read all messages (or `?since=ID` for new ones only) |
-| GET | `/latest` | Last 10 messages (or `?n=N`) |
-| GET | `/health` | Server status |
+### Message Types
+- **TASK** — Gets typed into the other Claude Code's terminal. Use for instructions that need action.
+- **REPLY** — Only displays in the ICQ viewer. Use for informational responses.
 
-### Example Usage (from Claude Code's perspective)
+### Loop Prevention
+- Max 5 rounds of TASK back-and-forth, then the agent pauses
+- When paused, it shows "CHAIN LIMIT REACHED" and waits for you to press Enter
+- REPLY messages reset the chain counter
 
-```bash
-# Send a message
-curl -X POST http://DESKTOP_IP:8765/send -H "Content-Type: application/json" -d '{"from": "laptop", "message": "Queens are ready on ports 5001 and 5002"}'
+### Emergency Stop
+Move your mouse to the top-left corner of the screen. pyautogui will abort.
 
-# Read new messages
-curl http://DESKTOP_IP:8765/read?since=5
-
-# Check last few messages
-curl http://DESKTOP_IP:8765/latest?n=3
-```
-
-## Setup
-
-### Server (run on one machine — e.g., the Laptop)
-```bash
-pip install flask
-python waggle_server.py
-```
-Server runs on port **8765** and listens on all interfaces (0.0.0.0) so both LAN machines can reach it.
-
-### ICQ Agent (run on BOTH machines — combined chat viewer + autonomous agent)
-```bash
-pip install flask pyautogui pyperclip pygetwindow
-
-# On Laptop:
-python waggle_icq.py --server http://localhost:8765 --me laptop-claude --watch desktop-claude
-
-# On Desktop:
-python waggle_icq.py --server http://LAPTOP_IP:8765 --me desktop-claude --watch laptop-claude
-```
-
-The ICQ agent does two things:
-1. **Chat Viewer** — shows all messages in a DOS-style ICQ interface with colors and flower emojis
-2. **Autonomous Agent** — types TASK messages into the local Claude Code terminal using clipboard paste
-
-Messages tagged REPLY only display in the viewer. Messages tagged TASK get typed into Claude Code.
-Loop prevention: max 5 rounds of back-and-forth, then pauses for human approval (press Enter).
-Emergency stop: move mouse to top-left corner of screen.
-
-### Terminals needed
+### Terminals Layout
 
 | Machine | Terminal 1 | Terminal 2 | Terminal 3 |
 |---------|-----------|-----------|-----------|
 | Laptop | Claude Code | waggle_server.py | waggle_icq.py |
 | Desktop | Claude Code | waggle_icq.py | — |
+
+### How Claude Code Instances Send Messages
+
+```bash
+# Send a TASK (will be typed into the other Claude Code's terminal)
+curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "TASK", "message": "your instruction here"}'
+
+# Send a REPLY (will only show in ICQ viewer, not typed)
+curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "your info here"}'
+
+# Read new messages
+curl -s http://10.0.0.1:8765/read?since=25
+
+# Check latest messages
+curl -s http://10.0.0.1:8765/latest?n=5
+```
+
+### Chat Logs
+- Saved continuously to `chat_log_laptop.txt` and `chat_log_desktop.txt`
+- Auto-pushed to GitHub every 10 minutes or every 30 messages
+
+---
+
+## Problems We Solved (2026-04-10)
+
+These are documented so future sessions don't repeat the same mistakes.
+
+1. **Window detection by keywords fails.** Claude Code changes its window title every conversation ("Review GitHub...", "Fix the bug...", etc). Keyword matching is useless. SOLUTION: At startup, show numbered list of all windows and let user pick once. Agent tracks by window handle after that.
+
+2. **Closing other windows doesn't break it.** After picking the window number, the agent stores the actual window handle, not the number. Closing Firefox or other windows is safe.
+
+3. **Server must be restarted when code changes.** The old server kept running with old code (no `type` field). Kill old processes by PID using `netstat -ano | grep 8765` then `taskkill //F //PID <number>`. On bash use `//F` not `/F`.
+
+4. **Multiple server instances can stack up.** Check with `netstat -ano | grep 8765`. Kill all before restarting.
+
+5. **git pull can open vim editor.** If `git pull` opens a scary text editor, type `:wq` and press Enter.
+
+6. **git pull can conflict on chat_log files.** Fix with: `git checkout --theirs chat_log_desktop.txt` then `git add chat_log_desktop.txt && git commit -m "resolve merge"`
+
+7. **Firewall commands break in copy-paste.** Long commands with `&&` can break when pasted into terminals. Always give firewall commands ONE AT A TIME.
+
+8. **OLLAMA_HOST must be set to 0.0.0.0** on both machines, or Ollama only listens on localhost and LAN connections fail.
+
+9. **Claude Code instances need to be told HOW to reply.** The first TASK sent to a new Claude Code session should explain the WaggleDance curl commands for replying.
+
+---
 
 ## Part of the BeehiveOfAI Ecosystem
 
