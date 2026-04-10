@@ -46,12 +46,19 @@ curl http://DESKTOP_IP:8765/latest?n=3
 
 ## Setup
 
+### Server (run on one machine — e.g., the Laptop)
 ```bash
 pip install flask
 python waggle_server.py
 ```
-
 Server runs on port **8765** and listens on all interfaces (0.0.0.0) so both LAN machines can reach it.
+
+### Agent (run on the OTHER machine — e.g., the Desktop)
+```bash
+pip install flask pyautogui pyperclip pygetwindow
+python waggle_agent.py --server http://LAPTOP_IP:8765 --name desktop-claude --watch laptop-claude
+```
+The agent polls for new messages and **types them directly into the Claude Code terminal** as if you were sitting there typing. Same session, same context, fully autonomous. Move your mouse to the top-left corner of the screen to emergency-stop the agent.
 
 ## Part of the BeehiveOfAI Ecosystem
 
