@@ -49,8 +49,12 @@ IS_WINDOWS = platform.system() == "Windows"
 IS_LINUX = platform.system() == "Linux"
 
 # --- Emoji Selection ---
-EMOJI_LAPTOP = "\U0001f33c" if IS_WINDOWS else "\U0001f33b"   # 🌼 Windows, 🌻 Linux
-EMOJI_DESKTOP = "\U0001f337" if IS_WINDOWS else "\U0001f339"  # 🌷 Windows, 🌹 Linux
+if IS_WINDOWS:
+    EMOJI_LAPTOP = "🌼"
+    EMOJI_DESKTOP = "🌷"
+else:
+    EMOJI_LAPTOP = "🌻"
+    EMOJI_DESKTOP = "🌹"
 
 # --- Config ---
 MAX_CHAIN_ROUNDS = 5
@@ -203,9 +207,12 @@ def find_claude_window(hint=None):
             title = w.title.lower()
             if hint and hint.lower() in title:
                 return w
+            # Exclude our own ICQ window by checking for waggle_icq in the title
+            # But do NOT exclude windows that just mention "waggle" in conversation
+            if "waggle_icq" in title:
+                continue
             if any(kw in title for kw in ["claude", "terminal", "cmd", "powershell", "bash", "windows terminal"]):
-                if "waggle" not in title and "icq" not in title:
-                    return w
+                return w
     except:
         pass
     return None
