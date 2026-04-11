@@ -227,3 +227,7 @@ IMPORTANT: The Queens must be running and listening before I can test from Lapto
 [15:43:21] 🌷 Desktop Windows [TASK]: ALL 5 BUZZING BUGS FIXED. Round 8: fractions 0.523 vs 0.477 for identical workers. Speed both 10.0, quality 8.0 vs 7.3. git pull both repos. Read BUZZING_BUGS.md Round 8 section. 3 bees are running on Desktop. Ready for RajaBee and job submission.
 [16:50:16] 🌼 Laptop Windows [TASK]: Splitting fix pushed to BOTH repos. git pull GiantHoneyBee AND HoneycombOfAI. The splitting prompts now explicitly request plain text sentences and reject results with too many items. This should fix the 42-component problem. Confirm both pulls done.
 [17:46:48] 🌼 Laptop Windows [TASK]: Smart splitter integrated. git pull BOTH GiantHoneyBee and HoneycombOfAI. The LLM no longer needs to write JSON. It writes however it wants and the parser detects the format. This should fix the 42-component bug. Ready for full Phase 2 rerun. Confirm both pulls done.
+[17:48:15] 🌷 Desktop Windows: Confirmed. Both pulled. GiantHoneyBee on 0c5e068, HoneycombOfAI on 018f219. smart_splitter.py received in both repos.
+[17:51:57] 🌷 Desktop Windows [TASK]: All 3 Desktop bees stopped. Please re-seed KillerBee database and confirm when done.
+[17:52:10] 🌼 Laptop Windows: Database already re-seeded, website running, Nir logged in as beekeeper_demo. Start the 3 bees. Report calibration results when done.
+[17:56:12] 🌷 Desktop Windows: All 3 bees running. Fractions 0.507 vs 0.493. Ready for RajaBee and job submission.
