@@ -350,7 +350,7 @@ def main():
                     chain_count = 0  # Reset chain on REPLY
                     if claude_window:
                         sender_label = args.watch.replace("-claude", "").replace("-", " ").title()
-                        reply_text = f"{sender_label} Claude said: {msg['message']}"
+                        reply_text = f"[WAGGLEDANCE ICQ AUTO-MESSAGE FROM {sender_label.upper()} CLAUDE]: {msg['message']}"
                         success = type_into_claude(claude_window, reply_text)
                         if success:
                             print_system(f"REPLY #{msg['id']} typed into Claude Code")

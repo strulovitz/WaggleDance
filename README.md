@@ -14,9 +14,12 @@
 
 **Terminal 1 — WaggleDance Server:**
 1. Open a terminal window
-2. Run this command:
+2. Run these commands (git pull gets latest code):
 ```
 cd C:\Users\nir_s\Projects\WaggleDance
+```
+```
+git pull
 ```
 3. Run this command:
 ```
@@ -53,9 +56,12 @@ python waggle_icq.py --server http://localhost:8765 --me laptop-claude --watch d
 
 **Terminal 2 — ICQ Chat Viewer + Agent:**
 1. Open a second terminal window
-2. Run this command:
+2. Run these commands (git pull gets latest code):
 ```
 cd C:\Users\nir_s\Projects\WaggleDance
+```
+```
+git pull
 ```
 3. Run this command:
 ```
@@ -71,7 +77,7 @@ The Claude Code instances need to know how to use WaggleDance. Copy-paste this a
 
 **For Laptop Claude Code:**
 ```
-You are connected to WaggleDance — a communication system that lets you talk to Desktop Claude Code autonomously. The WaggleDance server runs on this machine at http://localhost:8765. An ICQ agent is running that will type both TASK and REPLY messages from Desktop Claude into your terminal automatically. TASK means Desktop needs you to act. REPLY (prefixed with "Desktop Claude said:") is information for you.
+You are connected to WaggleDance — a communication system that lets you talk to Desktop Claude Code autonomously. The WaggleDance server runs on this machine at http://localhost:8765. An ICQ agent is running that will type both TASK and REPLY messages from Desktop Claude into your terminal automatically. TASK means Desktop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM DESKTOP CLAUDE]:") is information for you.
 
 To send a message to Desktop Claude, use curl:
 - TASK (Desktop Claude must act on it): curl -s -X POST http://localhost:8765/send -H "Content-Type: application/json" -d '{"from": "laptop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
@@ -85,7 +91,7 @@ Please read the GitHub repos at strulovitz to get full project context.
 
 **For Desktop Claude Code:**
 ```
-You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.1:8765. An ICQ agent is running that will type both TASK and REPLY messages from Laptop Claude into your terminal automatically. TASK means Laptop needs you to act. REPLY (prefixed with "Laptop Claude said:") is information for you.
+You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.1:8765. An ICQ agent is running that will type both TASK and REPLY messages from Laptop Claude into your terminal automatically. TASK means Laptop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM LAPTOP CLAUDE]:") is information for you.
 
 To send a message to Laptop Claude, use curl:
 - TASK (Laptop Claude must act on it): curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
@@ -163,7 +169,7 @@ Three components:
    - Shows all messages in a colored DOS-style chat (yellow = Laptop, magenta = Desktop)
    - Flower emojis: 🌼 Laptop Windows, 🌷 Desktop Windows (🌻 and 🌹 on Linux)
    - TASK messages get typed into the local Claude Code terminal automatically
-   - REPLY messages from the watched sender also get typed in, prefixed with "Desktop Claude said: " (or "Laptop Claude said: ")
+   - REPLY messages from the watched sender also get typed in, prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM DESKTOP CLAUDE]:" (or LAPTOP CLAUDE)
 3. **messages.json** — All messages persisted to disk
 
 ### Message Types
