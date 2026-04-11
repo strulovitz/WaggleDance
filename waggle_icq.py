@@ -344,10 +344,22 @@ def main():
                                      f"[AGENT] Cannot find Claude Code window for TASK #{msg['id']}",
                                      "REPLY")
 
+                elif msg["from"] == args.watch and msg.get("type") == "REPLY":
+                    # REPLY from watched sender — type into Claude Code
+                    # so the local Claude sees it without manual checking
+                    chain_count = 0  # Reset chain on REPLY
+                    if claude_window:
+                        reply_text = f"Desktop Claude said: {msg['message']}"
+                        success = type_into_claude(claude_window, reply_text)
+                        if success:
+                            print_system(f"REPLY #{msg['id']} typed into Claude Code")
+                        else:
+                            print_error(f"Failed to type REPLY #{msg['id']}")
+
                 elif msg["from"] != args.me:
-                    # REPLY from watched sender — just displayed, not typed
+                    # Messages from other senders — just displayed
                     if msg.get("type") != "TASK":
-                        chain_count = 0  # Reset chain on REPLY
+                        chain_count = 0
 
             # Periodic GitHub push
             now = time.time()
