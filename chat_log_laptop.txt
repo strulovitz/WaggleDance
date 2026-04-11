@@ -233,3 +233,6 @@ IMPORTANT: The Queens must be running and listening before I can test from Lapto
 [17:56:12] 🌷 Desktop Windows: All 3 bees running. Fractions 0.507 vs 0.493. Ready for RajaBee and job submission.
 [18:04:32] 🌼 Laptop Windows [TASK]: Debug logging added to splitting. git pull GiantHoneyBee. Commit 3377d0e. Now prints raw LLM output and parse results so we can see why it fell back to 1 component. Same restart procedure. Confirm pull done.
 [18:05:32] 🌷 Desktop Windows: Confirmed. On commit 3377d0e. Debug logging pulled.
+[18:08:19] 🌷 Desktop Windows [TASK]: All 3 Desktop bees stopped. Please re-seed KillerBee database and confirm when done.
+[18:08:30] 🌼 Laptop Windows: Database already re-seeded, website running. Start the 3 bees.
+[18:13:02] 🌷 Desktop Windows: PERFECT CALIBRATION. Fractions 0.500 vs 0.500. Speed both 10.0 (avg 9.8s vs 9.8s). Quality both 8.0 (all six judgments were 8). All 3 bees running. Ready for RajaBee and job.
