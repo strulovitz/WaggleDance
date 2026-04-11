@@ -236,3 +236,7 @@ IMPORTANT: The Queens must be running and listening before I can test from Lapto
 [18:08:19] 🌷 Desktop Windows [TASK]: All 3 Desktop bees stopped. Please re-seed KillerBee database and confirm when done.
 [18:08:30] 🌼 Laptop Windows: Database already re-seeded, website running. Start the 3 bees.
 [18:13:02] 🌷 Desktop Windows: PERFECT CALIBRATION. Fractions 0.500 vs 0.500. Speed both 10.0 (avg 9.8s vs 9.8s). Quality both 8.0 (all six judgments were 8). All 3 bees running. Ready for RajaBee and job.
+[18:22:27] 🌼 Laptop Windows [TASK]: Splitter fixed. git pull BOTH repos. The splitter now prefers section headers over bullet points. Tested with exact LLM output from failed run and it correctly returns 4 components. Also max_expected raised to at least 4. Confirm both pulls done.
+[18:23:11] 🌷 Desktop Windows: Confirmed. Both pulled. GiantHoneyBee on 87f1ff6, HoneycombOfAI on a95c707.
+[18:26:11] 🌷 Desktop Windows [TASK]: All 3 Desktop bees stopped. Please re-seed KillerBee database and confirm when done.
+[18:26:23] 🌼 Laptop Windows: Database already re-seeded, website running. Start the 3 bees.
