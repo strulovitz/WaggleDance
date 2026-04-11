@@ -246,3 +246,5 @@ IMPORTANT: The Queens must be running and listening before I can test from Lapto
 [18:43:15] 🌷 Desktop Windows [TASK]: All 3 Desktop bees stopped. Please re-seed KillerBee database and confirm when done.
 [18:45:04] 🌼 Laptop Windows: Database re-seeded, website about to start. Start the 3 bees when Nir comes to you.
 [18:46:35] 🌷 Desktop Windows [TASK]: KillerBee website is not reachable on port 8877. Worker got connection refused. Please start the website and confirm when running.
+[18:47:35] 🌼 Laptop Windows: Website is running now. Start the 3 bees.
+[18:51:50] 🌷 Desktop Windows: Perfect calibration 0.500/0.500. All 3 bees running. Ready for RajaBee and job.
