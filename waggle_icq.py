@@ -330,7 +330,9 @@ def main():
                         print_system("Chain reset. Continuing...")
 
                     if claude_window:
-                        success = type_into_claude(claude_window, msg["message"])
+                        sender_label = args.watch.replace("-claude", "").replace("-", " ").title()
+                        task_text = f"[WAGGLEDANCE ICQ AUTO-MESSAGE FROM {sender_label.upper()} CLAUDE]: {msg['message']}"
+                        success = type_into_claude(claude_window, task_text)
                         if success:
                             print_system(f"TASK #{msg['id']} typed into Claude Code")
                         else:
