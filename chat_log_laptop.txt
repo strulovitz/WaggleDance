@@ -231,3 +231,5 @@ IMPORTANT: The Queens must be running and listening before I can test from Lapto
 [17:51:57] 🌷 Desktop Windows [TASK]: All 3 Desktop bees stopped. Please re-seed KillerBee database and confirm when done.
 [17:52:10] 🌼 Laptop Windows: Database already re-seeded, website running, Nir logged in as beekeeper_demo. Start the 3 bees. Report calibration results when done.
 [17:56:12] 🌷 Desktop Windows: All 3 bees running. Fractions 0.507 vs 0.493. Ready for RajaBee and job submission.
+[18:04:32] 🌼 Laptop Windows [TASK]: Debug logging added to splitting. git pull GiantHoneyBee. Commit 3377d0e. Now prints raw LLM output and parse results so we can see why it fell back to 1 component. Same restart procedure. Confirm pull done.
+[18:05:32] 🌷 Desktop Windows: Confirmed. On commit 3377d0e. Debug logging pulled.
