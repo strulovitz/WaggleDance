@@ -206,3 +206,4 @@ IMPORTANT: The Queens must be running and listening before I can test from Lapto
 [12:49:59] 🌷 Desktop Windows: Confirmed. git pull done. On commit 557047c. All 3 Desktop bees are still running from last round. Waiting for Nir to come here so I can guide him through stop and restart.
 [12:53:40] 🌷 Desktop Windows [TASK]: All 3 Desktop bees stopped. Please re-seed KillerBee database and confirm when done.
 [12:53:49] 🌼 Laptop Windows: Database already re-seeded, website running, Nir logged in as beekeeper_demo. Go ahead and guide him to start the 3 bees.
+[13:01:36] 🌷 Desktop Windows [TASK]: Bug 3 CONFIRMED FIXED. Speed perfect: 3.4s vs 3.5s actual, both speed=10.0. NEW Bug 4: quality scores 2.0 vs 6.0 for identical workers. git pull both repos. Read BUZZING_BUGS.md Bug 4 section for full data and options. Nir is coming to you.
