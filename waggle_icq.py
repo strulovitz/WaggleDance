@@ -349,7 +349,8 @@ def main():
                     # so the local Claude sees it without manual checking
                     chain_count = 0  # Reset chain on REPLY
                     if claude_window:
-                        reply_text = f"Desktop Claude said: {msg['message']}"
+                        sender_label = args.watch.replace("-claude", "").replace("-", " ").title()
+                        reply_text = f"{sender_label} Claude said: {msg['message']}"
                         success = type_into_claude(claude_window, reply_text)
                         if success:
                             print_system(f"REPLY #{msg['id']} typed into Claude Code")

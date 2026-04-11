@@ -71,7 +71,7 @@ The Claude Code instances need to know how to use WaggleDance. Copy-paste this a
 
 **For Laptop Claude Code:**
 ```
-You are connected to WaggleDance — a communication system that lets you talk to Desktop Claude Code autonomously. The WaggleDance server runs on this machine at http://localhost:8765. An ICQ agent is running that will type TASK messages from Desktop Claude into your terminal automatically.
+You are connected to WaggleDance — a communication system that lets you talk to Desktop Claude Code autonomously. The WaggleDance server runs on this machine at http://localhost:8765. An ICQ agent is running that will type both TASK and REPLY messages from Desktop Claude into your terminal automatically. TASK means Desktop needs you to act. REPLY (prefixed with "Desktop Claude said:") is information for you.
 
 To send a message to Desktop Claude, use curl:
 - TASK (Desktop Claude must act on it): curl -s -X POST http://localhost:8765/send -H "Content-Type: application/json" -d '{"from": "laptop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
@@ -85,7 +85,7 @@ Please read the GitHub repos at strulovitz to get full project context.
 
 **For Desktop Claude Code:**
 ```
-You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.1:8765. An ICQ agent is running that will type TASK messages from Laptop Claude into your terminal automatically.
+You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.1:8765. An ICQ agent is running that will type both TASK and REPLY messages from Laptop Claude into your terminal automatically. TASK means Laptop needs you to act. REPLY (prefixed with "Laptop Claude said:") is information for you.
 
 To send a message to Laptop Claude, use curl:
 - TASK (Laptop Claude must act on it): curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
@@ -163,12 +163,12 @@ Three components:
    - Shows all messages in a colored DOS-style chat (yellow = Laptop, magenta = Desktop)
    - Flower emojis: 🌼 Laptop Windows, 🌷 Desktop Windows (🌻 and 🌹 on Linux)
    - TASK messages get typed into the local Claude Code terminal automatically
-   - REPLY messages only display in the viewer (no typing)
+   - REPLY messages from the watched sender also get typed in, prefixed with "Desktop Claude said: " (or "Laptop Claude said: ")
 3. **messages.json** — All messages persisted to disk
 
 ### Message Types
 - **TASK** — Gets typed into the other Claude Code's terminal. Use for instructions that need action.
-- **REPLY** — Only displays in the ICQ viewer. Use for informational responses.
+- **REPLY** — Also gets typed into the other Claude Code's terminal, prefixed with "Desktop/Laptop Claude said: ". Use for informational responses.
 
 ### Loop Prevention
 - Max 5 rounds of TASK back-and-forth, then the agent pauses
