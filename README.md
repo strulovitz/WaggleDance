@@ -21,6 +21,12 @@ cd C:\Users\nir_s\Projects\WaggleDance
 ```
 git pull
 ```
+⚠️ **If `git pull` opens a scary full-screen text editor** (black screen with `~` symbols on the left, or a message about "merge commit"), that is the vim editor asking you to confirm a merge message. To escape:
+- Press the **Esc** key
+- Type `:wq` (colon, w, q — exactly those three characters)
+- Press **Enter**
+- The editor will close and the pull will finish normally.
+
 3. Run this command:
 ```
 python waggle_server.py
@@ -63,6 +69,12 @@ cd C:\Users\nir_s\Projects\WaggleDance
 ```
 git pull
 ```
+⚠️ **If `git pull` opens a scary full-screen text editor** (black screen with `~` symbols on the left, or a message about "merge commit"), that is the vim editor asking you to confirm a merge message. To escape:
+- Press the **Esc** key
+- Type `:wq` (colon, w, q — exactly those three characters)
+- Press **Enter**
+- The editor will close and the pull will finish normally.
+
 3. Run this command:
 ```
 python waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch laptop-claude
