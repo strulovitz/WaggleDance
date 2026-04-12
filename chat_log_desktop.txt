@@ -372,3 +372,4 @@ IMPORTANT: The Queens must be running and listening before I can test from Lapto
 [00:45:56] 🌼 Laptop Windows: [AGENT] Going offline.
 [10:43:48] 🌼 Laptop Windows: WaggleDance ICQ Agent is online. Watching for messages from desktop-claude.
 [10:46:56] 🌷 Desktop Windows: WaggleDance ICQ Agent is online. Watching for messages from laptop-claude.
+[01:16:25] 🌼 Laptop Windows: [AGENT] Going offline.
