@@ -21,12 +21,35 @@ cd C:\Users\nir_s\Projects\WaggleDance
 ```
 git pull
 ```
-3. Run this command:
+⚠️ **If `git pull` opens a scary full-screen text editor** (black screen with `~` symbols on the left, or a message about "merge commit"), that is the vim editor asking you to confirm a merge message. To escape:
+- Press the **Esc** key
+- Type `:wq` (colon, w, q — exactly those three characters)
+- Press **Enter**
+- The editor will close and the pull will finish normally.
+
+3. **⚠️ WINDOWS ONLY — Free port 8765 from Hyper-V / WinNAT first.** Skip this step entirely on Linux.
+
+   **Why this step exists:** Windows has a background service called the Host Network Service (HNS / WinNAT), installed by Hyper-V, WSL2, Docker Desktop, Windows Sandbox, and Virtual Machine Platform. Every time Windows boots, HNS reserves several large blocks of TCP ports for its internal NAT plumbing — and the blocks it picks are **pseudo-random at every boot**. Some mornings port 8765 is free. Some mornings a block lands on top of it and the WaggleDance server fails to start with the error *"An attempt was made to access a socket in a way forbidden by its access permissions."* This is not a bug in WaggleDance and not something you did wrong — it is Windows rolling dice every morning. Bouncing WinNAT forces it to release its reserved ranges and re-pick them; the re-pick almost never lands on 8765 twice in a row.
+
+   **How to do it (Windows only):**
+   - Open a **Command Prompt as Administrator** (right-click the Start button → "Terminal (Admin)" or "Command Prompt (Admin)" → click Yes on the UAC prompt).
+   - Run these two commands, one at a time:
+   ```
+   net stop winnat
+   ```
+   ```
+   net start winnat
+   ```
+   - You should see "The Windows NAT Driver service was stopped successfully." followed by "The Windows NAT Driver service was started successfully."
+   - Close the admin terminal. You can now go back to the normal WaggleDance terminal for the next step.
+   - **On Linux: skip this entirely.** Linux does not have Hyper-V reserving ports — the problem does not exist there.
+
+4. Run this command:
 ```
 python waggle_server.py
 ```
-4. You should see "WaggleDance server starting on port 8765..."
-5. Leave this terminal open. Do not close it.
+5. You should see "WaggleDance server starting on port 8765..." If instead you see *"An attempt was made to access a socket in a way forbidden by its access permissions"*, it means HNS grabbed 8765 again after you bounced WinNAT (rare but possible). Repeat step 3 and try again.
+6. Leave this terminal open. Do not close it.
 
 **Terminal 2 — Claude Code:**
 1. Open a second terminal window
@@ -63,6 +86,12 @@ cd C:\Users\nir_s\Projects\WaggleDance
 ```
 git pull
 ```
+⚠️ **If `git pull` opens a scary full-screen text editor** (black screen with `~` symbols on the left, or a message about "merge commit"), that is the vim editor asking you to confirm a merge message. To escape:
+- Press the **Esc** key
+- Type `:wq` (colon, w, q — exactly those three characters)
+- Press **Enter**
+- The editor will close and the pull will finish normally.
+
 3. Run this command:
 ```
 python waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch laptop-claude
