@@ -10,22 +10,47 @@
 
 **Do this every morning. Follow the order exactly.**
 
+### 🛟 The only sync rule: run `./sync.sh`
+
+Both machines write to `chat_log_*.txt` and `messages.json` constantly, so `master` is **always** divergent. A bare `git pull` will fail. Do not ever run a bare `git pull` in this repo, on any machine, in any state.
+
+**The rule is one line:**
+```
+./sync.sh
+```
+(or `bash sync.sh` on Windows Git Bash)
+
+That is the entire procedure. It works:
+- on Laptop and Desktop, Windows and Linux,
+- whether the working tree is clean or dirty,
+- whether you have untracked files or not,
+- whether you are 0, 2, or 200 commits ahead or behind,
+- whether `pull.rebase` is configured or not (it sets it itself, idempotently),
+- whether you have local commits to push or not (it pushes them if so).
+
+You do not need to remember a setup step — the script reapplies its own one-time config every run. You do not need to remember to push afterward — the script pushes if needed. You do not need to know what `-X theirs` or `--no-edit` mean — the script uses them so vim never opens and chat-log conflicts auto-resolve.
+
+**If `./sync.sh` exits non-zero**, read the message it prints. There are exactly two failure modes and both tell you the next step:
+- *"pull failed"* → network or remote problem; your stash is safe; try again.
+- *"stash pop produced conflicts"* → a real conflict in code **you** edited; open the file, fix the `<<<<<` markers, `git add` + `git commit`. The script will not paper over genuine human conflicts.
+
+**Never run any of these in this repo:**
+- ❌ `git pull` (bare) — fails on divergence
+- ❌ `git reset --hard origin/master` — destroys local commits silently
+- ❌ `git push --force` — overwrites the other machine's commits
+
+If you forget everything else in this README, remember: **`./sync.sh`**.
+
+---
+
 ### LAPTOP (do this first)
 
 **Terminal 1 — WaggleDance Server:**
 1. Open a terminal window
-2. Run these commands (git pull gets latest code):
+2. Step into the folder, then run `./sync.sh` (the only sync rule — see section above):
 ```
 cd C:\Users\nir_s\Projects\WaggleDance
 ```
-```
-git pull
-```
-⚠️ **If `git pull` opens a scary full-screen text editor** (black screen with `~` symbols on the left, or a message about "merge commit"), that is the vim editor asking you to confirm a merge message. To escape:
-- Press the **Esc** key
-- Type `:wq` (colon, w, q — exactly those three characters)
-- Press **Enter**
-- The editor will close and the pull will finish normally.
 
 3. **⚠️ WINDOWS ONLY — Free port 8765 from Hyper-V / WinNAT first.** Skip this step entirely on Linux.
 
@@ -83,18 +108,10 @@ python waggle_icq.py --server http://localhost:8765 --me laptop-claude --watch d
 
 **Terminal 2 — ICQ Chat Viewer + Agent:**
 1. Open a second terminal window
-2. Run these commands (git pull gets latest code):
+2. Step into the folder, then run `./sync.sh` (the only sync rule — see section above):
 ```
 cd C:\Users\nir_s\Projects\WaggleDance
 ```
-```
-git pull
-```
-⚠️ **If `git pull` opens a scary full-screen text editor** (black screen with `~` symbols on the left, or a message about "merge commit"), that is the vim editor asking you to confirm a merge message. To escape:
-- Press the **Esc** key
-- Type `:wq` (colon, w, q — exactly those three characters)
-- Press **Enter**
-- The editor will close and the pull will finish normally.
 
 3. Run this command:
 ```
@@ -115,14 +132,10 @@ python waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch l
 
 **Terminal 2 — ICQ Chat Viewer (viewer-only on Linux):**
 1. Open a second terminal window
-2. The terminal on Desktop Linux already opens in the directory that contains all the repo folders (`WaggleDance`, `KillerBee`, `HoneycombOfAI`, etc.) — you do **not** need any absolute path. Just step into the WaggleDance folder from wherever the terminal opened:
+2. The terminal on Desktop Linux already opens in the directory that contains all the repo folders (`WaggleDance`, `KillerBee`, `HoneycombOfAI`, etc.) — you do **not** need any absolute path. Step into the WaggleDance folder, then run the **bulletproof git pull recipe** from the top of this guide:
 ```
 cd WaggleDance
 ```
-```
-git pull
-```
-⚠️ If `git pull` opens vim, press **Esc**, type `:wq`, press **Enter** (same rule as Windows).
 
 3. Run this command:
 ```
