@@ -329,35 +329,68 @@ def pick_claude_window():
             return None
 
 
+def _debug_log(text):
+    """Write transient/internal noise to a sibling debug file instead of
+    polluting the user-visible chat view."""
+    try:
+        debug_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "waggle_icq_debug.log"
+        )
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(debug_path, "a", encoding="utf-8") as f:
+            f.write(f"[{ts}] {text}\n")
+    except Exception:
+        pass
+
+
 def type_into_claude(window, message):
+    """Deliver a message into the locked Claude Code window.
+
+    Windows path: clipboard paste via Ctrl+V, with up to 3 refocus+retry
+    attempts. Linux path: wmctrl activate + pyautogui.write. Transient
+    SendInput failures (the classic "Error code 0 — operation completed
+    successfully" false-positive) are swallowed and retried; only a final
+    exhausted failure is surfaced to the chat view.
+    """
     if window is None:
         print_error("No Claude Code window locked (viewer-only mode). Message NOT auto-typed.")
         print_error("Poll manually with: curl -s <server>/latest?n=5")
         return False
-    try:
-        if IS_LINUX:
-            # X11 path: wmctrl activates, pyautogui.write types directly via
-            # Xlib. No clipboard involved — works without xclip/xsel/wl-copy.
+
+    if IS_LINUX:
+        try:
             window.activate()
             time.sleep(0.5)
             pyautogui.write(message, interval=0.005)
             time.sleep(0.2)
             pyautogui.press("enter")
             return True
+        except Exception as e:
+            _debug_log(f"Linux type failed: {e!r}")
+            print_error("Could not deliver message to Claude Code window.")
+            return False
 
-        # Windows path: clipboard paste via Ctrl+V.
-        if window.isMinimized:
-            window.restore()
-        window.activate()
-        time.sleep(0.5)
-        pyperclip.copy(message)
-        pyautogui.hotkey("ctrl", "v")
-        time.sleep(0.3)
-        pyautogui.press("enter")
-        return True
-    except Exception as e:
-        print_error(f"Type failed: {e}")
-        return False
+    # Windows: paste via clipboard, retry on transient SendInput hiccups.
+    last_err = None
+    for attempt in range(1, 4):
+        try:
+            if window.isMinimized:
+                window.restore()
+            window.activate()
+            time.sleep(0.4)
+            pyperclip.copy(message)
+            pyautogui.hotkey("ctrl", "v")
+            time.sleep(0.25)
+            pyautogui.press("enter")
+            return True
+        except Exception as e:
+            last_err = e
+            _debug_log(f"Windows type attempt {attempt}/3 failed: {e!r}")
+            time.sleep(0.2 * attempt)
+
+    print_error("Could not deliver message to Claude Code window after 3 attempts.")
+    _debug_log(f"Final failure delivering message; last error: {last_err!r}")
+    return False
 
 
 def main():
@@ -461,16 +494,20 @@ def main():
 
                 elif msg["from"] == args.watch and msg.get("type") == "REPLY":
                     # REPLY from watched sender — type into Claude Code
-                    # so the local Claude sees it without manual checking
+                    # so the local Claude sees it without manual checking.
+                    # Skip [AGENT] system status messages (online/offline/
+                    # delivery-failure notices) — those are infrastructure
+                    # noise, not Claude-to-Claude conversation, and should
+                    # never be keystroked into the terminal.
                     chain_count = 0  # Reset chain on REPLY
-                    if claude_window:
+                    if msg["message"].lstrip().startswith("[AGENT]"):
+                        pass  # display-only, do not auto-type
+                    elif claude_window:
                         sender_label = args.watch.replace("-claude", "").replace("-", " ").title()
                         reply_text = f"[WAGGLEDANCE ICQ AUTO-MESSAGE FROM {sender_label.upper()} CLAUDE]: {msg['message']}"
                         success = type_into_claude(claude_window, reply_text)
                         if success:
                             print_system(f"REPLY #{msg['id']} typed into Claude Code")
-                        else:
-                            print_error(f"Failed to type REPLY #{msg['id']}")
 
                 elif msg["from"] != args.me:
                     # Messages from other senders — just displayed
