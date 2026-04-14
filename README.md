@@ -10,7 +10,7 @@
 
 **Do this every morning. Follow the order exactly.**
 
-### LAPTOP (do this first)
+### 💻🪟 LAPTOP — if booted into Windows 11 (do this first)
 
 **Terminal 1 — WaggleDance Server:**
 1. Open a terminal window
@@ -70,11 +70,11 @@ python waggle_icq.py --server http://localhost:8765 --me laptop-claude --watch d
 5. You should see the flower header and "Agent running. Watching for messages..."
 6. Leave this terminal open. Do not close it.
 
-### DESKTOP (do this second)
+### 🖥️ DESKTOP (do this second)
 
 **Pick the section that matches how Desktop is booted right now.** The folder path and the ICQ behavior are different on Windows vs Linux.
 
-#### DESKTOP — if booted into Windows 11
+#### 🖥️🪟 DESKTOP — if booted into Windows 11
 
 **Terminal 1 — Claude Code:**
 1. Open a terminal window
@@ -104,7 +104,7 @@ python waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch l
 5. You should see the flower header and "Agent running. Watching for messages..."
 6. Leave this terminal open. Do not close it.
 
-#### DESKTOP — if booted into Linux Mint 22.2
+#### 🖥️🐧 DESKTOP — if booted into Linux Mint 22.2
 
 **Terminal 1 — Claude Code:**
 1. Open a terminal window (the Cinnamon default terminal is fine)
@@ -136,7 +136,7 @@ python3 waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch 
 
 The Claude Code instances need to know how to use WaggleDance. Copy-paste this as your first message to EACH Claude Code (both Laptop and Desktop):
 
-**For Laptop Claude Code:**
+**💻🪟 For Laptop Claude Code (Windows 11):**
 ```
 You are connected to WaggleDance — a communication system that lets you talk to Desktop Claude Code autonomously. The WaggleDance server runs on this machine at http://localhost:8765. An ICQ agent is running that will type both TASK and REPLY messages from Desktop Claude into your terminal automatically. TASK means Desktop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM DESKTOP CLAUDE]:") is information for you.
 
@@ -150,7 +150,7 @@ Desktop IP is 10.0.0.5. Desktop has Ollama with llama3.2:3b. Desktop has Honeyco
 Please read the GitHub repos at strulovitz to get full project context.
 ```
 
-**For Desktop Claude Code (Windows):**
+**🖥️🪟 For Desktop Claude Code (Windows 11):**
 ```
 You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.1:8765. An ICQ agent is running that will type both TASK and REPLY messages from Laptop Claude into your terminal automatically. TASK means Laptop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM LAPTOP CLAUDE]:") is information for you.
 
@@ -164,7 +164,7 @@ Laptop IP is 10.0.0.1. Both machines have Ollama, Python, Flask, and all repos c
 Please read the GitHub repos at strulovitz to get full project context.
 ```
 
-**For Desktop Claude Code (Linux Mint 22.2 Cinnamon):**
+**🖥️🐧 For Desktop Claude Code (Linux Mint 22.2 Cinnamon):**
 ```
 You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.1:8765. An ICQ agent is running on this Linux machine that will type both TASK and REPLY messages from Laptop Claude into your terminal automatically, exactly the same way it works on Windows. TASK means Laptop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM LAPTOP CLAUDE]:") is information for you.
 
