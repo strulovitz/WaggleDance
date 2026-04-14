@@ -143,7 +143,7 @@ Note both `virtual size` and `disk size`. The virtual size is the filesystem's l
 
 ### 4.5 Throw away the 7 overlay clones
 
-They are useless to us now. They point at the template as a backing file, they live on the small root partition, and the work that has been done inside `giantqueen-b` (hostname, machine-id) is cheap to redo in the new clone.
+They are useless to us now. They point at the template as a backing file, they live on the small root partition, and the work that has been done inside `giantqueen-b` (hostname, machine-id) is cheap to redo in the new VM.
 
 ```bash
 # First, make sure they are NOT running (see §4.1).
@@ -154,56 +154,76 @@ for vm in giantqueen-b dwarfqueen-b1 dwarfqueen-b2 worker-b1 worker-b2 worker-b3
 done
 ```
 
-If `--remove-all-storage` complains or does not remove the overlay qcow2 files, remove them by hand from wherever they were created. **Do NOT delete `desktop-template.qcow2` yet** — we still need it as the source for the copies.
+If `--remove-all-storage` complains or does not remove the overlay qcow2 files, remove them by hand from wherever they were created. **You may ALSO delete `desktop-template.qcow2` once you have confirmed the autoinstall cloud-init config (§4.6) is preserved in git — we are NOT going to clone from the template anymore, so it is no longer load-bearing.** If unsure, leave it alone for now.
 
-### 4.6 Make 7 real full copies on the big volume
+### 4.6 Autoinstall 7 fresh Ubuntu VMs from scratch
 
-Use `qemu-img convert` — it is the correct tool. It preserves sparseness, it produces a completely independent qcow2, it is what production KVM workflows use for template → instance.
+**This is the key change from the original briefing.** We are NOT going to clone the template. We are going to build 7 fresh Ubuntu installs, the exact same way the template itself was built. Yes, this takes longer — probably 10–30 minutes per VM depending on autoinstall config and CPU. We are trading execution time for zero risk of clever-tool footguns. Nir's explicit direction: when the executor is unreliable, pick the long simple path over the short clever path.
 
-```bash
-cd $BIG/libvirt-images
+**Why this is safer than any form of copy/convert/clone:**
+- Each VM goes through the exact same autoinstall pipeline that built `desktop-template.qcow2` in the first place. That pipeline is already proven to work on this machine.
+- There is no qcow2 manipulation, no sparse-file handling, no `cp` flags, no backing-file indirection, no shared state between VMs.
+- If an autoinstall fails, you redo that one autoinstall. You do not debug "why did the copy produce a broken image." Fewer failure modes.
+- The result is 7 genuinely independent Ubuntu systems. Each one was installed by Ubuntu's own installer. There is no shared history, no fingerprint overlap, no risk of hidden coupling.
 
-for vm in giantqueen-b dwarfqueen-b1 dwarfqueen-b2 worker-b1 worker-b2 worker-b3 worker-b4; do
-  echo "=== cloning template to $vm.qcow2 ==="
-  sudo qemu-img convert -O qcow2 -S 4k \
-    /var/lib/libvirt/images/desktop-template.qcow2 \
-    $BIG/libvirt-images/$vm.qcow2
-  df -h $BIG   # confirm disk usage after each copy, just in case
-done
-```
-
-`-O qcow2` = output format qcow2. `-S 4k` = preserve sparseness at 4 KB granularity. Each output file will be a **completely independent** qcow2 with no backing-file dependency. You can verify afterward with:
+**Prerequisites.** Desktop, you MUST have the autoinstall config that built `desktop-template.qcow2`. Typically this is a cloud-init `user-data` + `meta-data` pair, or an Ubuntu autoinstall YAML seed. Find it:
 
 ```bash
-qemu-img info $BIG/libvirt-images/giantqueen-b.qcow2 | grep -E "backing|virtual|disk"
+# Wherever you ran the template autoinstall from — likely under your home dir
+find ~/ -name "user-data" -o -name "autoinstall*.yaml" -o -name "meta-data" 2>/dev/null
+# Or check the KillerBee repo — it may already be committed there
+grep -r "autoinstall" ~/Projects/KillerBee/ 2>/dev/null
 ```
 
-You should see **no** `backing file:` line. If there is one, something went wrong and you should stop and report.
+**If you cannot find the autoinstall config**, STOP and report to Nir via ICQ. Do not improvise. Do not re-download the ISO and walk through the installer GUI — that is not reproducible. The config must exist somewhere; it was used to produce the template earlier today.
 
-### 4.7 Redefine the 7 libvirt domains pointing at the new files
+**Once you have the config**, write a small shell script that loops over the 7 VM names and for each one:
+1. Copies the autoinstall config into a fresh working directory.
+2. Edits ONLY the hostname in the config so the new VM gets the right name (e.g. `giantqueen-b`, `dwarfqueen-b1`, etc.). Leave everything else alone.
+3. Calls `virt-install` with the correct RAM, the correct disk path on the big volume, and the autoinstall seed.
+4. Waits for the autoinstall to complete (libvirt + autoinstall handles this — the VM shuts down when the install finishes, typically).
+5. Moves to the next VM.
 
-For each VM, either edit the saved XML or use `virt-install --import` to register it with libvirt using the new qcow2 path. The RAM tiers you had before are correct and stay the same:
+RAM tiers (unchanged from before):
 
-- `giantqueen-b`: 12 GB RAM
-- `dwarfqueen-b1`, `dwarfqueen-b2`: 8 GB RAM each
-- `worker-b1..b4`: 4 GB RAM each
+- `giantqueen-b`: 12288 MB
+- `dwarfqueen-b1`, `dwarfqueen-b2`: 8192 MB each
+- `worker-b1`, `worker-b2`, `worker-b3`, `worker-b4`: 4096 MB each
 
-Example for one VM (adapt for each):
+Disk size: pick whatever the template used (probably 20–40 GB virtual, which will be sparse on disk, starting at ~8.6 GB real). **Do NOT increase the disk size just because you have room.** Matching the template keeps behavior predictable.
+
+Example `virt-install` invocation for one VM (adapt names and RAM per tier):
 
 ```bash
 virt-install \
   --name giantqueen-b \
   --memory 12288 \
   --vcpus 2 \
-  --disk path=$BIG/libvirt-images/giantqueen-b.qcow2,format=qcow2,bus=virtio \
+  --disk path=$BIG/libvirt-images/giantqueen-b.qcow2,format=qcow2,bus=virtio,size=20 \
   --os-variant ubuntu24.04 \
   --network network=default,model=virtio \
   --graphics none \
-  --import \
+  --location 'http://releases.ubuntu.com/24.04/,kernel=casper/vmlinuz,initrd=casper/initrd' \
+  --extra-args 'autoinstall ds=nocloud-net;s=http://_gateway:3003/' \
   --noautoconsole
 ```
 
-Boot each VM, set its hostname, regenerate its machine-id (`sudo rm /etc/machine-id /var/lib/dbus/machine-id && sudo systemd-machine-id-setup`), regenerate SSH host keys (`sudo rm /etc/ssh/ssh_host_* && sudo dpkg-reconfigure openssh-server`), reboot, confirm SSH from the host works, move to the next.
+Exact flags depend on how the template autoinstall was configured. The point is: **reuse the same method that built the template.** Do not invent a new one.
+
+**Run them one at a time, not in parallel.** Seven autoinstalls running concurrently on a CPU-only host will thrash each other. Finish one, verify it boots, then start the next. Total wall-clock time: probably 2–4 hours. That is fine. You are trading time for safety.
+
+### 4.7 After each VM completes autoinstall
+
+1. Boot the VM (`virsh start <name>`) — if the autoinstall shut it down automatically, this will boot it into the finished Ubuntu.
+2. From inside, verify hostname is correct.
+3. Verify `machine-id` is unique (Ubuntu autoinstall generates a fresh one at install time — you should not need the `systemd-machine-id-setup` trick, but verify with `cat /etc/machine-id`).
+4. Verify SSH host keys are unique (again, fresh install = fresh keys by default).
+5. Install Ollama if the template did not already include it: follow the exact same install steps used for the template.
+6. Bind Ollama to `0.0.0.0:11434` (same as template).
+7. From the host, `curl http://<vm-ip>:11434/api/version` should return JSON.
+8. Only then move on to the next VM.
+
+If any step fails, STOP that VM, destroy + undefine it, redo the autoinstall for only that VM, and try again. Do not keep going on top of a broken VM.
 
 ### 4.8 Only then pull models
 
@@ -213,22 +233,26 @@ Once all 7 are standalone, cleanly hostnamed, and reachable over SSH, *then* go 
 
 ## 5. Sanity checks before you declare Phase 3 done
 
-1. `qemu-img info` for each clone shows **no backing file**.
-2. `df -h $BIG` shows reasonable free space after all copies (plenty, since you have 1.9 TB).
+1. `qemu-img info` for each VM shows **no backing file line**. Each VM is fully standalone.
+2. `df -h $BIG` shows reasonable free space (plenty, since you have 1.9 TB).
 3. `df -h /` is nowhere near 100 %.
 4. All 7 VMs boot independently of each other.
-5. You can `rm /var/lib/libvirt/images/desktop-template.qcow2` and all 7 VMs still boot. **DO NOT actually delete the template** — just confirm mentally that you *could*.
-6. `ollama pull` on one VM does not affect the others (disk usage on one qcow2 grows, the others do not).
+5. Each VM has a unique hostname, a unique `/etc/machine-id`, and unique SSH host keys. (With fresh autoinstalls this should be automatic. Verify anyway.)
+6. Ollama on each VM responds to `curl http://<vm-ip>:11434/api/version` from the host.
+7. `ollama pull` on one VM does not affect the others (disk usage on one qcow2 grows, the others do not).
 
 ---
 
 ## 6. Things to NOT do
 
-- Do **NOT** use `sudo cp` again without `--sparse=always`. It is the thing that filled the disk the first time.
+- Do **NOT** use `sudo cp` on qcow2 files. Ever. Not in this session, not later. It is the thing that filled the disk the first time. We are not copying qcow2 files at all anymore — we are autoinstalling fresh ones.
 - Do **NOT** use `qemu-img create -b` (backing-file overlays). We are explicitly moving away from that pattern.
+- Do **NOT** use `qemu-img convert` either. Nir's direction: the simple long path, not the clever short path. We are autoinstalling 7 fresh Ubuntu systems. That is the whole method.
+- Do **NOT** run multiple autoinstalls in parallel on this CPU-only host. One at a time.
 - Do **NOT** repartition or resize the root filesystem. That is destructive and far beyond the scope of this fix.
-- Do **NOT** delete `desktop-template.qcow2` until after all 7 clones exist and boot independently. It is still the source of truth until then.
-- Do **NOT** boot `desktop-template.qcow2` itself ever again. If you need to modify the template, make a new one.
+- Do **NOT** invent a new autoinstall method. Reuse whatever autoinstall config already built `desktop-template.qcow2` earlier today. If you cannot find it, STOP and ask Nir — do not improvise.
+- Do **NOT** boot `desktop-template.qcow2` itself ever again. If you need to inspect the autoinstall config, read the config files, do not boot the template.
+- Do **NOT** increase disk size "just because there is room." Match whatever the template used.
 - Do **NOT** ask Nir via ICQ to explain this document. The document IS the explanation. If something is unclear, reread it. If it is still unclear, ask one specific question in ICQ pointing at the specific section.
 - Do **NOT** "generalize" this fix to Laptop. Laptop's lane today is BeeSting videos. Stay in your lane.
 
