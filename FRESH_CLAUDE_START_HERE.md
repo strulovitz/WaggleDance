@@ -112,6 +112,63 @@ Ask Nir in plain text. One question. Wait for the answer. Do not guess.
 
 ---
 
+## 9. Bootstrap: what to do if nothing is cloned yet
+
+You may wake up on a machine where none of the repos have been cloned yet (typical on a fresh Linux boot). You need the repos before anything else. Run, in order:
+
+```
+sudo apt install -y git
+```
+```
+mkdir -p ~/Projects && cd ~/Projects
+```
+```
+for r in WaggleDance KillerBee HoneycombOfAI GiantHoneyBee BeehiveOfAI BeeSting Honeymation MadHoney TheDistributedAIRevolution; do git clone https://github.com/strulovitz/$r.git; done
+```
+
+If even `git` is not installed and you cannot wait for the apt install, you can read this single file with `curl` before cloning:
+
+```
+curl -s https://raw.githubusercontent.com/strulovitz/WaggleDance/master/FRESH_CLAUDE_START_HERE.md | less
+```
+
+But you will need the full clones eventually — start the `apt install` + loop above as the first thing you do.
+
+---
+
+## 10. For Nir — first-message template to paste into a fresh Linux Claude Code session
+
+When you start Claude Code on a freshly-booted Linux machine, paste **this entire block** as your very first message. Fill in the two bracketed placeholders. Everything else is ready to copy as-is.
+
+```
+You are Claude Code running on my [Desktop | Laptop] machine, which I just booted into [Linux Mint 22.2 | Debian 13]. This is a fresh session with no prior history on this OS. Your auto-memory is empty because auto-memory lives in a per-OS directory.
+
+Your role: [desktop-linux-claude | laptop-linux-claude].
+Your track today: testing (Phase 3 VM setup) per WaggleDance/PARALLEL_VIBING.md.
+Your mission: guide me through KillerBee/PHASE3_LINUX_VM_SETUP.md step by step, one command at a time, so we end the session with at least one working bridged VM running Ollama on the LAN, confirmed reachable from the other physical machine.
+
+Before touching the mission, bootstrap yourself:
+
+1. Install git and clone all repos under ~/Projects per the loop in WaggleDance/FRESH_CLAUDE_START_HERE.md section 9.
+2. Read, in this order:
+   - WaggleDance/FRESH_CLAUDE_START_HERE.md (end to end, including sections 5 and 6)
+   - WaggleDance/PARALLEL_VIBING.md (end to end)
+   - WaggleDance/WHEN_TO_USE_WAGGLEDANCE.md
+   - WaggleDance/LESSONS.md
+   - KillerBee/CLAUDE.md (Rule 1 and Rule 2 are load-bearing)
+   - KillerBee/PROJECT_REPORT.md (latest state, especially "What Has NOT Been Done")
+   - KillerBee/PHASE3_LINUX_VM_SETUP.md (this is your runbook)
+3. Send one ICQ REPLY on WaggleDance to laptop-claude announcing: role, track, repos synced, docs read, ready to start at section 4 of PHASE3_LINUX_VM_SETUP.md. Use the ASCII-only curl format from FRESH_CLAUDE_START_HERE section 7. The WaggleDance server is on the Laptop at http://10.0.0.1:8765.
+4. Report back to me in plain text summarizing what you read and confirm you are ready.
+5. Wait for me to say "go" before running any real commands on the system.
+
+Do not use task-tracking tools. Do not fabricate. Do not reward-hack. Ask me if anything is unclear — one question at a time. I have ADD and am not a programmer, so give me ultra-detailed copy-paste instructions, one command per code block, with a one-sentence explanation of what each command does before I paste it.
+```
+
+That single paste is enough to get Desktop Linux Claude (or Laptop Linux Claude) fully briefed and on-mission with nothing else. Edit only the two bracketed placeholders, nothing else.
+
+---
+
 ## Changelog
 
 - **2026-04-14** — Initial version written by Desktop Windows Claude (Opus 4.6) during the first parallel-vibing day, in preparation for Desktop Linux Claude coming online later the same day for the Phase 3 VM setup mission.
