@@ -53,7 +53,7 @@ Track here. Check off when done.
 
 - [x] **Laptop Windows** — applied 2026-04-14 (this machine, the one that created this file)
 - [ ] **Desktop Windows** — pending (was in Desktop Linux phase when this file was written; will apply when Nir boots Desktop back into Windows)
-- [ ] **Desktop Linux** — pending (currently running, needs to pull + apply)
+- [x] **Desktop Linux** — applied 2026-04-14 (already present from earlier session, verified by Desktop Claude)
 - [ ] **Laptop Linux** — pending (does not exist yet; Nir plans to boot Laptop into Linux after the role swap)
 
 When you apply this on a new machine, edit this file to check off the box, commit, push.
