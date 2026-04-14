@@ -79,7 +79,17 @@ If the question is in **none** of those, Desktop Linux is in genuinely new terri
 
 ## 6. ICQ auto-type behavior during this phase
 
-- **Linux Mint Cinnamon defaults to X11**, not Wayland. `pygetwindow` should work on X11. The paste shortcut branch landed in commit `0830b54`. So auto-typing in **both directions** should work once Desktop is on Linux Mint.
+### 6.1 What the Linux code fix actually does (commit 0830b54)
+
+Two real code changes you should understand, in case Desktop Linux asks you about them or in case you need to explain the ICQ setup to a fresh Laptop Linux Claude tomorrow:
+
+1. **Paste shortcut is different on Linux.** On Windows terminals, the paste keyboard shortcut is `Ctrl+V`. On **Linux terminals, it is `Ctrl+Shift+V`** — plain `Ctrl+V` does nothing (or types a literal `v`). The original `waggle_icq.py` and `waggle_agent.py` hard-coded `Ctrl+V`, which meant the auto-typer silently failed on Linux. The fix added `IS_LINUX = platform.system() == "Linux"` and branches: `pyautogui.hotkey("ctrl", "shift", "v")` on Linux, `pyautogui.hotkey("ctrl", "v")` on Windows. Same copy method (pyperclip), different paste combo.
+
+2. **Wayland fallback.** `pygetwindow` (the library that finds the Claude Code window to paste into) works on Windows and on Linux X11 sessions, but it cannot enumerate windows on Wayland. The fix wraps the import and the `getAllWindows()` call in `try/except`. If either fails, the tool drops to **viewer-only mode** — it still prints incoming messages to its own terminal, but does not try to auto-paste. The human then copy-pastes the message into Claude Code by hand. No crash, no silent failure.
+
+### 6.2 What this means for you during this phase
+
+- **Linux Mint Cinnamon defaults to X11**, not Wayland. `pygetwindow` should work on X11, and the paste branch now uses the correct shortcut. So auto-typing in **both directions** should work once Desktop is on Linux Mint.
 - **But untested.** If Desktop Linux reports that auto-type does not work on his side, he will drop to viewer-only and poll manually with `curl -s http://10.0.0.1:8765/latest?n=5`. His responses will arrive with a noticeable delay (seconds to minutes) because he reads on his own cadence. **Do not spam him thinking he is offline.** Silence from him during that phase is normal.
 - **If your own `waggle_icq.py` on Laptop Windows starts behaving strangely** during the phase, that is a separate bug, not a Linux side effect. Restart your ICQ terminal per the daily startup in `README.md`.
 
