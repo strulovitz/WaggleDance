@@ -106,14 +106,14 @@ python waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch l
 
 #### DESKTOP — if booted into Linux Mint 22.2
 
-⚠️ **Important Linux caveat — read this before you start.** `pygetwindow` does not work on Linux, so the ICQ will **not** prompt you to pick a window and it will **not** auto-type messages into Desktop Claude Code. It runs in **viewer-only mode**: incoming messages from Laptop print in the ICQ terminal, and you copy-paste them into Desktop Claude Code by hand. Outbound messages from Desktop Claude still work fine (they are sent with `curl`). This is a real limitation, not a bug, and until it is fixed you are the human relay for Laptop → Desktop traffic.
+✅ **Full auto-type works on Mint Cinnamon (X11).** Since 2026-04-14 the ICQ has a real Linux backend built on `wmctrl` (already at `/usr/bin/wmctrl` on stock Mint) and `pyautogui.write()`. You get the same numbered window picker and the same auto-type as on Windows. No extra packages to install, no clipboard tools, no sudo. Do not worry if you see a past version of the README that talked about "viewer-only mode" — that is obsolete; `git pull` to catch up.
 
 **Terminal 1 — Claude Code:**
 1. Open a terminal window (the Cinnamon default terminal is fine)
 2. Start Claude Code as you normally do
 3. Leave this terminal open. Do not close it.
 
-**Terminal 2 — ICQ Chat Viewer (viewer-only on Linux):**
+**Terminal 2 — ICQ Chat Viewer + Agent:**
 1. Open a second terminal window
 2. The terminal on Desktop Linux already opens in the directory that contains all the repo folders (`WaggleDance`, `KillerBee`, `HoneycombOfAI`, etc.) — you do **not** need any absolute path. Just step into the WaggleDance folder from wherever the terminal opened:
 ```
@@ -128,16 +128,11 @@ git pull
 ```
 python3 waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch laptop-claude
 ```
-4. You will **not** see a numbered window list — the ICQ will print something like *"pygetwindow unavailable on this platform. Running in VIEWER-ONLY mode."* That is expected on Linux. Do not try to "fix" it by installing extra packages.
-5. You should see the flower header and incoming messages as they arrive from Laptop.
+4. You will see a numbered list of windows, same as on Windows. Type the NUMBER of the Claude Code window (from Terminal 1) and press Enter. The Claude Code window usually appears in the list with a title starting with `⠂ ...` (followed by the current conversation title).
+5. You should see `[SYSTEM] Locked onto: '<title>'` followed by the flower header and `Agent running. Watching for messages...`
 6. Leave this terminal open. Do not close it.
 
-**Terminal 3 — Poller (optional but recommended):**
-If you do not want to sit and stare at Terminal 2, you can also run a manual poll from a third terminal any time:
-```
-curl -s http://10.0.0.1:8765/latest?n=5
-```
-Whichever terminal you use, **when a TASK or REPLY arrives for Desktop, you must copy the text and paste it into Terminal 1 (Desktop Claude Code) yourself.** There is no auto-type on Linux.
+⚠️ **If you see `wmctrl not available or not an X11 session` followed by `VIEWER-ONLY mode`:** something is wrong. Either `wmctrl` got uninstalled, or you are logged into a Wayland session instead of X11. On Mint 22.2 Cinnamon the session is X11 by default, so this should not happen — if it does, log out and log back in and try again, and if it still happens, tell Claude Code and let it diagnose via `LINUX_DIAG_PROMPT.md`.
 
 ### FIRST MESSAGE TO EACH CLAUDE CODE
 
@@ -171,25 +166,20 @@ Laptop IP is 10.0.0.1. Both machines have Ollama, Python, Flask, and all repos c
 Please read the GitHub repos at strulovitz to get full project context.
 ```
 
-**For Desktop Claude Code (Linux Mint 22.2):**
+**For Desktop Claude Code (Linux Mint 22.2 Cinnamon):**
 ```
-You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code. The WaggleDance server runs on the Laptop at http://10.0.0.1:8765.
+You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.1:8765. An ICQ agent is running on this Linux machine that will type both TASK and REPLY messages from Laptop Claude into your terminal automatically, exactly the same way it works on Windows. TASK means Laptop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM LAPTOP CLAUDE]:") is information for you.
 
-IMPORTANT — you are on Linux and the ICQ is in VIEWER-ONLY mode. pygetwindow does not work on Linux, so the ICQ agent can NOT auto-type messages from Laptop Claude into your terminal. Instead, Nir is the human relay: incoming Laptop messages will show up in the ICQ viewer terminal and he will copy-paste them into your terminal by hand. Outbound messages from you to Laptop still work normally via curl.
-
-Because of this, you should:
-1. Poll for new messages yourself every few minutes with: curl -s http://10.0.0.1:8765/latest?n=5
-2. When you send a TASK to Laptop, state clearly what you need, because there is no chat-style back-and-forth on the Linux side.
-3. Never assume Nir saw a message you sent — if you need confirmation, ask him directly in the terminal.
+The Linux backend for the ICQ uses wmctrl for window enumeration and activation, plus pyautogui.write for keystroke injection via Xlib. No clipboard, no xdotool, no sudo. This only works under X11 (which Mint 22.2 Cinnamon uses by default) — if you are ever on Wayland it falls back to viewer-only mode and you will need to poll manually.
 
 To send a message to Laptop Claude, use curl (ASCII ONLY — no em-dashes, smart quotes, arrows, or emojis, they break the JSON):
 - TASK (Laptop Claude must act on it): curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
 - REPLY (just information, no action needed): curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "YOUR INFO HERE"}'
 - To check for replies: curl -s http://10.0.0.1:8765/latest?n=5
 
-Laptop IP is 10.0.0.1. Desktop IP is 10.0.0.5. All repos are already cloned directly in the directory where your terminal opens by default on this Linux boot — `WaggleDance`, `KillerBee`, `HoneycombOfAI`, `GiantHoneyBee`, `BeehiveOfAI`, `BeeSting`, `Honeymation`, `MadHoney`, `TheDistributedAIRevolution` are all right there as immediate subfolders. Use relative paths (`cd WaggleDance`, `cd KillerBee`, etc.) — do not guess an absolute path.
+Laptop IP is 10.0.0.1. Desktop IP is 10.0.0.5. All repos are already cloned directly in the directory where your terminal opens by default on this Linux boot — WaggleDance, KillerBee, HoneycombOfAI, GiantHoneyBee, BeehiveOfAI, BeeSting, Honeymation, MadHoney, TheDistributedAIRevolution are all right there as immediate subfolders. Use relative paths (cd WaggleDance, cd KillerBee, etc.) — do not guess an absolute path.
 
-Before any real work, read WaggleDance/FRESH_CLAUDE_START_HERE.md end to end — sections 5, 6, and 11 are the critical ones for a Linux session. Then read WaggleDance/PARALLEL_VIBING.md, WaggleDance/WHEN_TO_USE_WAGGLEDANCE.md, and WaggleDance/LESSONS.md. Then read the source-of-truth files for whichever track Nir gives you.
+Before any real work, read WaggleDance/FRESH_CLAUDE_START_HERE.md end to end (sections 5, 6, 10b, and 11 are load-bearing for a Linux session), then WaggleDance/PARALLEL_VIBING.md, WaggleDance/WHEN_TO_USE_WAGGLEDANCE.md, and WaggleDance/LESSONS.md section 3 (the full story of the Linux backend). If you will be on a track that touches testing, also read KillerBee/PROJECT_REPORT.md. Then please read the GitHub repos at strulovitz to get full project context.
 ```
 
 ### DONE!
