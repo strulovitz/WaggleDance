@@ -1,158 +1,167 @@
-# Linux Diagnostic Prompt — for Desktop Linux Claude (and later Laptop Linux Claude)
+# TASK FOR DESKTOP LINUX CLAUDE — EXECUTE IN FULL, DO NOT ASK
 
-**Who this is for:** a Claude Code session running on one of Nir's Linux machines. Laptop Claude (on Windows) needs to know exactly what is installed and what display server is running before writing a Linux window-picker backend for `waggle_icq.py`. Do not guess, do not improvise — run the exact commands below, capture the output, commit it, push it.
+**If you are Claude Code running on Nir's Desktop machine booted into Linux Mint 22.2 Cinnamon, and you just ran `git pull` in the `WaggleDance` folder and pulled this file — this file is your current task. Do every step in order. Do not ask Nir anything. Do not skip steps. Do not improvise. Do not install packages. Do not edit `waggle_icq.py`. When you are done, commit, push, and send one ICQ REPLY, then go silent and wait.**
 
-## Step 1 — Identify which machine you are on
+Nir does not want to copy-paste commands. He will not relay command output. Everything you need to do is in this file. Everything Laptop Claude needs back from you, you will put into a committed file and push. That is the only channel.
 
-Run this and remember the answer:
+---
 
-```
-hostname && uname -a && cat /etc/os-release | head -5
-```
+## Context (why this exists)
 
-You should be able to tell from the output whether you are on **Desktop (Linux Mint 22.2 Cinnamon)** or **Laptop (Debian 13 GNOME)**. If you are unsure, ask Nir one question and wait for the answer.
+Laptop Claude is on Windows and cannot see your Linux machine. He is about to write a Linux backend for `waggle_icq.py` so that the ICQ on Desktop Linux gets a real numbered window picker and real auto-type (instead of the current viewer-only fallback). Before he writes a single line of code, he needs to know:
 
-## Step 2 — Gather environment info
+- Whether your session is X11 or Wayland
+- Which desktop environment is actually active
+- Which of `wmctrl`, `xdotool`, `ydotool`, `xdpyinfo`, `xclip`, `xsel`, `wl-copy` are installed
+- Which Python packages (`pyautogui`, `pyperclip`, `pygetwindow`) are importable on your Python 3
+- Whether `wmctrl -l` and `xdotool search --name ""` actually return window lists on your live session
 
-Run each of these commands **one at a time** and capture the full stdout of each. Do not skip any. Do not add flags. If a command is not found, capture that too (`command not found` is a valid answer and tells Laptop Claude to `apt install` it).
+This is pure read-only diagnostics. You will not change system state. You will only read, write one Markdown file, commit, push, ICQ.
 
-```
-echo "XDG_SESSION_TYPE=$XDG_SESSION_TYPE"
-```
-```
-echo "WAYLAND_DISPLAY=$WAYLAND_DISPLAY"
-```
-```
-echo "DISPLAY=$DISPLAY"
-```
-```
-echo "XDG_CURRENT_DESKTOP=$XDG_CURRENT_DESKTOP"
-```
-```
-loginctl show-session $(loginctl | awk '/seat/ {print $1; exit}') -p Type -p Remote 2>&1 || true
-```
-```
-command -v wmctrl || echo "wmctrl: NOT INSTALLED"
-```
-```
-command -v xdotool || echo "xdotool: NOT INSTALLED"
-```
-```
-command -v ydotool || echo "ydotool: NOT INSTALLED"
-```
-```
-command -v xdpyinfo || echo "xdpyinfo: NOT INSTALLED"
-```
-```
-command -v wl-copy || echo "wl-copy: NOT INSTALLED"
-```
-```
-command -v xclip || echo "xclip: NOT INSTALLED"
-```
-```
-command -v xsel || echo "xsel: NOT INSTALLED"
-```
-```
-python3 --version
-```
-```
-python3 -c "import pyautogui; print('pyautogui', pyautogui.__version__)" 2>&1 || echo "pyautogui: NOT IMPORTABLE"
-```
-```
-python3 -c "import pyperclip; print('pyperclip', pyperclip.__version__)" 2>&1 || echo "pyperclip: NOT IMPORTABLE"
-```
-```
-python3 -c "import pygetwindow; print('pygetwindow', pygetwindow.__version__)" 2>&1 || echo "pygetwindow: NOT IMPORTABLE"
-```
-```
-wmctrl -l 2>&1 | head -20 || true
-```
-```
-xdotool search --name "" 2>&1 | head -5 || true
-```
+---
 
-## Step 3 — Write the results into a file in the WaggleDance repo
+## Step 1 — Confirm you are in the right place
 
-From the directory that contains the `WaggleDance` folder (same directory where your terminal opened by default — Nir confirmed this is the default on both Linux machines), do:
+You should already be in the `WaggleDance` folder because Nir ran `git pull` there to get this file. Confirm:
 
 ```
-cd WaggleDance
+pwd
 ```
 ```
-git pull
+ls -la LINUX_DIAG_PROMPT.md
 ```
 
-Then create a file named **exactly** one of these, depending on which machine you are on:
+If `pwd` does not end in `/WaggleDance` or the file is not listed, stop and send Nir a one-line plain-text question asking where he ran `git pull`. Otherwise continue.
 
-- `LINUX_DIAG_DESKTOP.md` — if you are on Desktop (Linux Mint 22.2)
-- `LINUX_DIAG_LAPTOP.md` — if you are on Laptop (Debian 13)
+---
 
-The file must have this structure (fill in every section with the literal output from Step 2 — do not summarize, do not reformat, do not remove error lines):
+## Step 2 — Run every diagnostic command below, one at a time, and capture the exact stdout+stderr of each
+
+Run each command as written. Do not add flags. Do not pipe to anything. If a command errors, capture the error verbatim — error output is valuable data for Laptop Claude, not a failure for you. Do not fabricate results. Do not skip a command because you think you know the answer.
+
+1. `hostname`
+2. `uname -a`
+3. `cat /etc/os-release`
+4. `echo "XDG_SESSION_TYPE=$XDG_SESSION_TYPE"`
+5. `echo "WAYLAND_DISPLAY=$WAYLAND_DISPLAY"`
+6. `echo "DISPLAY=$DISPLAY"`
+7. `echo "XDG_CURRENT_DESKTOP=$XDG_CURRENT_DESKTOP"`
+8. `echo "XDG_SESSION_DESKTOP=$XDG_SESSION_DESKTOP"`
+9. `echo "DESKTOP_SESSION=$DESKTOP_SESSION"`
+10. `loginctl show-session $(loginctl | awk '/seat/ {print $1; exit}') -p Type -p Remote -p Class -p Desktop 2>&1`
+11. `command -v wmctrl || echo "wmctrl: NOT INSTALLED"`
+12. `command -v xdotool || echo "xdotool: NOT INSTALLED"`
+13. `command -v ydotool || echo "ydotool: NOT INSTALLED"`
+14. `command -v xdpyinfo || echo "xdpyinfo: NOT INSTALLED"`
+15. `command -v xclip || echo "xclip: NOT INSTALLED"`
+16. `command -v xsel || echo "xsel: NOT INSTALLED"`
+17. `command -v wl-copy || echo "wl-copy: NOT INSTALLED"`
+18. `python3 --version`
+19. `which python3`
+20. `python3 -c "import sys; print(sys.executable); print(sys.path)"`
+21. `python3 -c "import pyautogui; print('pyautogui', pyautogui.__version__)" 2>&1`
+22. `python3 -c "import pyperclip; print('pyperclip', pyperclip.__version__)" 2>&1`
+23. `python3 -c "import pygetwindow; print('pygetwindow', pygetwindow.__version__)" 2>&1`
+24. `python3 -c "import Xlib; print('Xlib', Xlib.__version__)" 2>&1`
+25. `wmctrl -l 2>&1 | head -30`
+26. `wmctrl -lp 2>&1 | head -30`
+27. `xdotool search --name "" 2>&1 | head -5`
+28. `xdotool getactivewindow getwindowname 2>&1`
+29. `xdpyinfo 2>&1 | head -5`
+30. `ps -e -o pid,comm 2>&1 | grep -iE "cinnamon|muffin|gnome-shell|kwin|xfwm|mutter|wayland|Xorg|Xwayland" | head -20`
+
+---
+
+## Step 3 — Write the results into a file
+
+Create a file named exactly `LINUX_DIAG_DESKTOP.md` in the `WaggleDance` folder (same folder you are already in). The file must contain one section per numbered command from Step 2, in order, with the literal unedited output of that command. Use this structure:
 
 ```markdown
-# Linux Diagnostic Results — <Desktop or Laptop>
+# Linux Diagnostic Results — Desktop (Linux Mint 22.2 Cinnamon)
 
-## hostname + uname + os-release
-<paste output>
+Generated by Desktop Linux Claude on <today's date>.
+This is a machine-readable diagnostic dump. Do not summarize, do not prettify.
+Laptop Claude will parse this to decide which Linux backend to build for waggle_icq.py.
 
-## Session / display server
-XDG_SESSION_TYPE=...
-WAYLAND_DISPLAY=...
-DISPLAY=...
-XDG_CURRENT_DESKTOP=...
+## 1. hostname
+<literal stdout>
 
-loginctl output:
-<paste output>
+## 2. uname -a
+<literal stdout>
 
-## Tools installed
-wmctrl: <path or NOT INSTALLED>
-xdotool: <path or NOT INSTALLED>
-ydotool: <path or NOT INSTALLED>
-xdpyinfo: <path or NOT INSTALLED>
-wl-copy: <path or NOT INSTALLED>
-xclip: <path or NOT INSTALLED>
-xsel: <path or NOT INSTALLED>
+## 3. cat /etc/os-release
+<literal stdout>
 
-## Python
-python3: <version>
-pyautogui: <version or NOT IMPORTABLE>
-pyperclip: <version or NOT IMPORTABLE>
-pygetwindow: <version or NOT IMPORTABLE>
+## 4. XDG_SESSION_TYPE
+<literal stdout>
 
-## Live window enumeration attempts
-wmctrl -l (first 20 lines):
-<paste output, including errors>
+## 5. WAYLAND_DISPLAY
+<literal stdout>
 
-xdotool search --name "" (first 5 lines):
-<paste output, including errors>
+... and so on through command 30 ...
+
+## 30. Running window-manager / compositor processes
+<literal stdout>
 ```
 
+Rules for this file:
+- **No summarization.** If a command returned 18 lines, paste all 18.
+- **No reformatting.** Keep blank lines, tabs, error messages exactly as printed.
+- **No hiding errors.** If command 21 said `ModuleNotFoundError: No module named 'pyautogui'`, write that.
+- **No guessing.** If a command hung or you had to Ctrl-C it, write `<command hung, aborted after N seconds>` — do not invent fake output.
+
+---
+
 ## Step 4 — Commit and push
+
+Run each command one at a time. Do not chain with `&&` in case one fails silently.
 
 ```
 git add LINUX_DIAG_DESKTOP.md
 ```
-(or `LINUX_DIAG_LAPTOP.md` on Laptop)
+```
+git status
+```
+
+(Verify the file is staged. If not, stop and send Nir a plain-text question.)
 
 ```
-git commit -m "diag: Linux environment info for waggle_icq backend work"
+git commit -m "diag: Desktop Linux Mint 22.2 environment dump for waggle_icq backend"
 ```
 ```
 git push
 ```
 
-## Step 5 — Send one ICQ REPLY to Laptop Claude
+If `git push` asks for credentials or errors out, send Nir a plain-text question with the exact error and wait. Do not try `--force`. Do not try `-u origin master`. Do not try to set up a new remote. Just stop and ask.
 
-ASCII only. Exactly one message. Example:
+---
+
+## Step 5 — Send exactly ONE ICQ REPLY to Laptop Claude
+
+The WaggleDance server is on Laptop at `http://10.0.0.1:8765`. ASCII only — no em-dashes, no smart quotes, no emojis, no arrows, no ellipses. If you write a non-ASCII character the Flask server will return `400 Bad Request`.
+
+Run this command exactly as written:
 
 ```
-curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "Diag pushed: LINUX_DIAG_DESKTOP.md committed to WaggleDance master. Ready for backend instructions."}'
+curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "LINUX_DIAG_DESKTOP.md pushed to WaggleDance master. Ready for Linux backend instructions. Viewer-only mode, will not auto-type, poll replies with curl /latest."}'
 ```
 
-## Rules
+You should see a response like `{"id":<number>,"ok":true}`. If you see anything else (especially `400 Bad Request`), stop and send Nir a plain-text question with the exact response.
 
-- **Do not install anything.** This step is read-only diagnostics. Laptop Claude will decide which packages are needed based on what you report.
-- **Do not edit waggle_icq.py.** Not yet. Laptop Claude writes the backend, pushes it, and only then do you pull and test.
-- **Do not fabricate.** If a command errors or returns nothing, write that exactly. A missing tool is valuable information. A made-up version number is poison.
-- **Do not use task-tracking tools.** Nir has ADD and they clutter the terminal.
-- **If anything is unclear, send Nir one plain-text question and wait.**
+---
+
+## Step 6 — Go silent
+
+After the `curl` returns `ok:true`, do nothing further. Do not start new work. Do not poll obsessively. Do not send more ICQ messages. Do not edit any file. Wait for Nir's next instruction in the terminal. Laptop Claude will `git pull` your diagnostic file, read it, write the Linux backend for `waggle_icq.py`, push it, and Nir will tell you to pull and test. Until then, idle.
+
+---
+
+## Reminders (load-bearing)
+
+- **NO REWARD HACKING.** If something does not work, report it. Do not fake success.
+- **NO FABRICATION.** Never invent test output, version strings, or process names. Laptop Claude is making architectural decisions based on what you report, and a lie here wastes hours of real work.
+- **NO TASK-TRACKING TOOLS.** Nir has ADD and explicitly banned task lists in the terminal. Track mentally.
+- **ASK, DO NOT GUESS.** If a step is ambiguous, send Nir one plain-text question and wait. One question saves the session.
+- **NIR IS NOT A PROGRAMMER AND HAS ADD.** You are doing this work, not him. He is not pasting commands. He is not reading your stdout. The only channel from you to Laptop Claude is a committed, pushed file plus one ICQ REPLY.
+- **ASCII ONLY IN ICQ CURL PAYLOADS.**
+- **FRESH_CLAUDE_START_HERE.md, PARALLEL_VIBING.md, WHEN_TO_USE_WAGGLEDANCE.md, LESSONS.md** are still required reading if this is your first conversation on this machine. Read them after Step 6, while you are idle waiting for Laptop Claude's next push.
