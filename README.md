@@ -97,9 +97,10 @@ python waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch l
 
 **Terminal 2 — ICQ Chat Viewer + Agent:**
 1. Open a second terminal window
-2. The terminal on Desktop Linux already opens in the directory that contains all the repo folders (`WaggleDance`, `KillerBee`, `HoneycombOfAI`, etc.) — you do **not** need any absolute path. Step into the WaggleDance folder, then run the **bulletproof git pull recipe** from the top of this guide:
+2. The terminal on Desktop Linux already opens in the directory that contains all the repo folders (`WaggleDance`, `KillerBee`, `HoneycombOfAI`, etc.) — you do **not** need any absolute path. Step into the WaggleDance folder, then run `./sync.sh` (the only sync rule — see section above):
 ```
 cd WaggleDance
+./sync.sh
 ```
 
 3. Run this command:
