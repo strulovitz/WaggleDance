@@ -115,9 +115,9 @@ python waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch l
 
 **Terminal 2 — ICQ Chat Viewer (viewer-only on Linux):**
 1. Open a second terminal window
-2. Run these commands (git pull gets latest code):
+2. The terminal on Desktop Linux already opens in the directory that contains all the repo folders (`WaggleDance`, `KillerBee`, `HoneycombOfAI`, etc.) — you do **not** need any absolute path. Just step into the WaggleDance folder from wherever the terminal opened:
 ```
-cd ~/Projects/WaggleDance
+cd WaggleDance
 ```
 ```
 git pull
@@ -187,7 +187,7 @@ To send a message to Laptop Claude, use curl (ASCII ONLY — no em-dashes, smart
 - REPLY (just information, no action needed): curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "YOUR INFO HERE"}'
 - To check for replies: curl -s http://10.0.0.1:8765/latest?n=5
 
-Laptop IP is 10.0.0.1. Desktop IP is 10.0.0.5. Both machines have Ollama, Python, and all repos cloned (on this Linux boot your repos live under ~/Projects/, not under /mnt/c/... or C:\\).
+Laptop IP is 10.0.0.1. Desktop IP is 10.0.0.5. All repos are already cloned directly in the directory where your terminal opens by default on this Linux boot — `WaggleDance`, `KillerBee`, `HoneycombOfAI`, `GiantHoneyBee`, `BeehiveOfAI`, `BeeSting`, `Honeymation`, `MadHoney`, `TheDistributedAIRevolution` are all right there as immediate subfolders. Use relative paths (`cd WaggleDance`, `cd KillerBee`, etc.) — do not guess an absolute path.
 
 Before any real work, read WaggleDance/FRESH_CLAUDE_START_HERE.md end to end — sections 5, 6, and 11 are the critical ones for a Linux session. Then read WaggleDance/PARALLEL_VIBING.md, WaggleDance/WHEN_TO_USE_WAGGLEDANCE.md, and WaggleDance/LESSONS.md. Then read the source-of-truth files for whichever track Nir gives you.
 ```
