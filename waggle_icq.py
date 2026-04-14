@@ -440,7 +440,7 @@ def main():
 
     # Announce
     send_message(args.server, args.me,
-                 f"WaggleDance ICQ Agent is online. Watching for messages from {args.watch}.",
+                 f"[AGENT] WaggleDance ICQ Agent is online. Watching for messages from {args.watch}.",
                  "REPLY")
 
     print_system("Agent running. Watching for messages...\n")
