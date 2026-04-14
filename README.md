@@ -106,8 +106,6 @@ python waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch l
 
 #### DESKTOP — if booted into Linux Mint 22.2
 
-✅ **Full auto-type works on Mint Cinnamon (X11).** Since 2026-04-14 the ICQ has a real Linux backend built on `wmctrl` (already at `/usr/bin/wmctrl` on stock Mint) and `pyautogui.write()`. You get the same numbered window picker and the same auto-type as on Windows. No extra packages to install, no clipboard tools, no sudo. Do not worry if you see a past version of the README that talked about "viewer-only mode" — that is obsolete; `git pull` to catch up.
-
 **Terminal 1 — Claude Code:**
 1. Open a terminal window (the Cinnamon default terminal is fine)
 2. Start Claude Code as you normally do
