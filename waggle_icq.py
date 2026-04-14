@@ -27,7 +27,13 @@ from datetime import datetime
 
 import pyautogui
 import pyperclip
-import pygetwindow as gw
+
+try:
+    import pygetwindow as gw
+    GW_AVAILABLE = True
+except Exception:
+    gw = None
+    GW_AVAILABLE = False
 
 # Safety
 pyautogui.FAILSAFE = True
@@ -202,12 +208,33 @@ def send_message(server_url, name, message, msg_type="REPLY"):
 
 
 def pick_claude_window():
-    """Show numbered list of windows. User picks once, then fully autonomous."""
+    """Show numbered list of windows. User picks once, then fully autonomous.
+
+    On Linux under Wayland, pygetwindow cannot enumerate windows. In that case
+    we return None and run in viewer-only mode — the user polls ICQ manually
+    with curl /latest?n=5 and pastes messages into Claude Code by hand."""
+    if not GW_AVAILABLE:
+        print_error("pygetwindow unavailable on this platform (likely Wayland).")
+        print_error("Running in VIEWER-ONLY mode. Messages will NOT be auto-typed.")
+        print_error("Poll manually with: curl -s <server>/latest?n=5")
+        return None
+
+    try:
+        all_windows = gw.getAllWindows()
+    except Exception as e:
+        print_error(f"Window enumeration failed ({e}). Running in VIEWER-ONLY mode.")
+        print_error("Poll manually with: curl -s <server>/latest?n=5")
+        return None
+
     windows = []
-    for w in gw.getAllWindows():
+    for w in all_windows:
         t = w.title.strip()
         if t and w.visible and "waggle_icq" not in t.lower():
             windows.append(w)
+
+    if not windows:
+        print_error("No windows found. Running in VIEWER-ONLY mode.")
+        return None
 
     print_system("Which window is Claude Code? Pick a number:\n")
     for i, w in enumerate(windows):
@@ -231,6 +258,10 @@ def pick_claude_window():
 
 
 def type_into_claude(window, message):
+    if window is None:
+        print_error("No Claude Code window locked (viewer-only mode). Message NOT auto-typed.")
+        print_error("Poll manually with: curl -s <server>/latest?n=5")
+        return False
     try:
         if window.isMinimized:
             window.restore()
@@ -238,7 +269,10 @@ def type_into_claude(window, message):
         time.sleep(0.5)
 
         pyperclip.copy(message)
-        pyautogui.hotkey("ctrl", "v")
+        if IS_LINUX:
+            pyautogui.hotkey("ctrl", "shift", "v")
+        else:
+            pyautogui.hotkey("ctrl", "v")
         time.sleep(0.3)
         pyautogui.press("enter")
         return True

@@ -12,12 +12,21 @@ Usage:
 """
 
 import argparse
+import platform
 import time
 import json
 import subprocess
 import pyautogui
 import pyperclip
-import pygetwindow as gw
+
+try:
+    import pygetwindow as gw
+    GW_AVAILABLE = True
+except Exception:
+    gw = None
+    GW_AVAILABLE = False
+
+IS_LINUX = platform.system() == "Linux"
 
 # Safety: don't let pyautogui go haywire
 pyautogui.FAILSAFE = True  # Move mouse to top-left corner to abort
@@ -25,12 +34,19 @@ pyautogui.PAUSE = 0.05
 
 
 def find_claude_window():
-    """Find the terminal window running Claude Code."""
-    for w in gw.getAllWindows():
+    """Find the terminal window running Claude Code. Returns None on platforms
+    where pygetwindow cannot enumerate windows (e.g. Linux Wayland)."""
+    if not GW_AVAILABLE:
+        print("[warn] pygetwindow unavailable (likely Linux Wayland). Viewer-only mode.")
+        return None
+    try:
+        all_windows = gw.getAllWindows()
+    except Exception as e:
+        print(f"[warn] window enumeration failed ({e}). Viewer-only mode.")
+        return None
+    for w in all_windows:
         title = w.title.lower()
-        # Claude Code runs in terminal windows — look for common patterns
         if any(keyword in title for keyword in ['claude', 'terminal', 'cmd', 'powershell', 'bash', 'mintty', 'windows terminal']):
-            # Skip our own window if we're running in a terminal too
             if 'waggle_agent' not in title:
                 return w
     return None
@@ -65,20 +81,27 @@ def send_reply(server_url, name, message):
 
 
 def type_into_claude(window, message):
-    """Focus the Claude Code window and type the message."""
+    """Focus the Claude Code window and type the message.
+
+    On Linux terminals, paste is Ctrl+Shift+V, not Ctrl+V. If window is None
+    (viewer-only mode, e.g. Wayland), skip typing and log the message so the
+    user can paste manually."""
+    if window is None:
+        print(f"[viewer-only] Message NOT auto-typed. Paste manually:\n---\n{message}\n---")
+        return False
     try:
-        # Activate the window
         if window.isMinimized:
             window.restore()
         window.activate()
-        time.sleep(0.5)  # Wait for focus
+        time.sleep(0.5)
 
-        # Use clipboard paste — much faster and safer than typing char by char
         pyperclip.copy(message)
-        pyautogui.hotkey('ctrl', 'v')
+        if IS_LINUX:
+            pyautogui.hotkey('ctrl', 'shift', 'v')
+        else:
+            pyautogui.hotkey('ctrl', 'v')
         time.sleep(0.3)
 
-        # Press Enter to submit
         pyautogui.press('enter')
         print(f"[typed] Message delivered to Claude Code")
         return True

@@ -169,65 +169,13 @@ That single paste is enough to get Desktop Linux Claude (or Laptop Linux Claude)
 
 ---
 
-## 11. Linux-specific caveats (read if you are a Linux Claude)
+## 11. Linux notes (short)
 
-`waggle_icq.py` in its current form was written for Windows and has three real problems on Linux. These are documented here, not yet fixed in code, so you need to work around them by hand until Nir asks for the code fix.
-
-### 11.1 The ICQ auto-typing agent does not work on Linux
-
-`waggle_icq.py` imports `pygetwindow` (flaky on X11, broken on Wayland — and Debian 13 defaults to Wayland) and uses `pyautogui.hotkey("ctrl", "v")` for pasting, which is the **wrong shortcut** in Linux terminals (they use `Ctrl+Shift+V`). So on Linux:
-
-- You will **not** see messages from the other Claude auto-typed into your terminal with the `[WAGGLEDANCE ICQ AUTO-MESSAGE FROM ... CLAUDE]:` prefix.
-- You must **poll manually** for new ICQ messages. Every ~3-5 turns of work, or whenever you finish a sub-step and are about to move to the next, run:
-
-```
-curl -s http://10.0.0.1:8765/latest?n=5
-```
-
-Look for messages `from` the other machine that you have not seen before. The server returns them in JSON with an `id` counter — remember the highest `id` you have already processed, and only act on strictly-greater ids. A TASK message from the other machine is something you must act on; a REPLY is informational.
-
-- When you send a message, the **other** Claude will still receive it auto-typed if they are on Windows (because their `waggle_icq.py` is running correctly on Windows). The problem is one-directional: Windows <- Linux works fine, Linux <- anyone does not auto-type.
-
-- Do not try to run `waggle_icq.py` on Linux and hope it silently works. It will either crash on startup (pygetwindow import on Wayland) or appear to run but never actually type into your terminal when a TASK arrives.
-
-### 11.2 If you are Laptop Linux Claude specifically: the WaggleDance server hosting issue
-
-The WaggleDance server (`waggle_server.py`) has historically run on Laptop Windows at `http://10.0.0.1:8765`. That IP/port is baked into every other machine's config. When Laptop reboots from Windows into Linux, the server process dies, and the channel is **down** until someone starts it again.
-
-Two options when you wake up as Laptop Linux Claude:
-
-**Option A (recommended, zero reconfiguration):** Start the server on Laptop Linux immediately, before doing anything else. Same command as Windows, minus the winnat dance (Linux does not need it):
-
-```
-cd ~/Projects/WaggleDance
-```
-```
-git pull
-```
-```
-pip install flask requests
-```
-```
-python waggle_server.py
-```
-
-You should see `WaggleDance server starting on port 8765...`. Leave that terminal open. The other machine can now reach you at `http://10.0.0.1:8765` exactly as before — the IP belongs to the Laptop hardware, not the OS, so it stays the same across reboots.
-
-**Option B (architectural alternative, requires reconfiguring clients):** Move the server to Desktop (`http://10.0.0.5:8765`) for the duration of the Laptop-Linux phase, so Laptop reboots never kill the channel. This avoids the reboot gap but requires telling every other Claude and every ICQ agent to point at the new URL. Only worth it if Laptop is expected to reboot multiple times.
-
-Default to Option A unless Nir explicitly asks for B.
-
-### 11.3 ASCII-only rule still applies on Linux
-
-The ASCII-only restriction on WaggleDance curl payloads was originally caught on Windows Bash, but keep using ASCII-only on Linux too. Straight quotes, plain hyphens, three-dot ellipses, `->` arrows. Costs nothing, works everywhere, and makes commit messages and ICQ messages look consistent across the project.
-
-### 11.4 First message for Laptop Linux Claude — extra step
-
-If you are pasting the §10 first-message template into a fresh **Laptop Linux** Claude Code session (not Desktop Linux), add this sentence at the end of the template, right before the final paragraph:
-
-> *"Before anything else — before cloning repos, before reading docs — start the WaggleDance server on this Linux host per FRESH_CLAUDE_START_HERE section 11.2 Option A. Desktop Claude is currently cut off from the ICQ until you bring the server up. That is your first action."*
-
-This makes server restoration the very first thing Laptop Linux Claude does, instead of burying it in the reading list.
+- **Paste shortcut:** `waggle_icq.py` and `waggle_agent.py` now branch on `IS_LINUX` and use `Ctrl+Shift+V` on Linux instead of `Ctrl+V`. No action needed — just run the same commands as on Windows.
+- **Wayland fallback:** if `pygetwindow` cannot enumerate windows (default on Debian 13 / GNOME Wayland), the ICQ tools drop to **viewer-only** mode automatically — they print incoming messages to the terminal they are running in, and you paste them by hand into Claude Code. No crash. No silent failure. On X11 sessions (Linux Mint Cinnamon default) window detection should work normally.
+- **No `winnat` step:** skip step 3 of the Laptop daily startup in `README.md` — Hyper-V does not exist on Linux and there is no port reservation to bounce.
+- **ASCII-only rule still applies.** Same reason as Windows — keep curl payloads plain ASCII.
+- **Server restart after reboot** is already part of the normal morning WaggleDance startup (see `README.md` "Nir's Daily Startup Guide"). When a machine reboots into a new OS, run the full morning startup again on whichever machine hosts the server. Nothing special, no new procedure.
 
 ---
 
