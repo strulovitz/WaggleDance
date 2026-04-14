@@ -46,6 +46,18 @@ Once this works on Windows, extend to Linux (Mint 22.2 on Desktop, Debian 13 on 
 
 The physical machine does not dictate the track. The **OS boot choice** does. Each Claude Code instance, regardless of which machine or OS it runs on, can talk to the currently-active Claude on the other machine via WaggleDance ICQ.
 
+### 2.3 OS switches end one Claude and start another
+
+When a physical machine reboots from one OS into the other (Windows <-> Linux), the Claude Code session on that machine **ends**. A fresh Claude Code session starts on the new OS, with **no conversation history** and — importantly — with **empty auto-memory**, because auto-memory lives under `C:\Users\nir_s\.claude\...` on Windows and `~/.claude/...` on Linux. These are separate directories.
+
+The new Claude must bootstrap itself from the repos alone. The entry point for that is `WaggleDance/FRESH_CLAUDE_START_HERE.md` — it loads the minimum rules that would otherwise have come from auto-memory (no reward hacking, ask don't guess, ASCII only, etc.) and points to the rest of the docs in reading order. Every Linux Claude session on this project must start by reading that file.
+
+Handoff ritual when the outgoing Claude knows a reboot is coming:
+1. Outgoing Claude commits and pushes any in-progress work to the relevant repo.
+2. Outgoing Claude sends a single ICQ REPLY to the other machine's Claude stating "Desktop is rebooting into Linux now, state committed as <commit>, mission is <X>, the new Claude should read FRESH_CLAUDE_START_HERE then <mission-doc>."
+3. Nir reboots. Outgoing Claude session ends.
+4. New Claude starts on the new OS, is pointed at `FRESH_CLAUDE_START_HERE.md`, does the handshake, and takes over.
+
 ## 3. Coordination Protocol
 
 All cross-machine coordination goes through WaggleDance ICQ. Rules:
