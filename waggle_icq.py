@@ -35,6 +35,14 @@ except Exception:
     gw = None
     GW_AVAILABLE = False
 
+# pygetwindow raises NotImplementedError at import time on Linux, but the
+# try/except above only catches import failures. On Linux the import
+# "succeeds" and then every call raises. Force-disable it on Linux so we
+# always fall through to the wmctrl backend.
+if platform.system() == "Linux":
+    GW_AVAILABLE = False
+    gw = None
+
 # Safety
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = 0.05
@@ -207,29 +215,93 @@ def send_message(server_url, name, message, msg_type="REPLY"):
         print_error(f"Send failed: {e}")
 
 
-def pick_claude_window():
-    """Show numbered list of windows. User picks once, then fully autonomous.
+class _LinuxWmctrlWindow:
+    """pygetwindow-compatible shim backed by wmctrl for X11 Linux.
 
-    On Linux under Wayland, pygetwindow cannot enumerate windows. In that case
-    we return None and run in viewer-only mode — the user polls ICQ manually
-    with curl /latest?n=5 and pastes messages into Claude Code by hand."""
-    if not GW_AVAILABLE:
-        print_error("pygetwindow unavailable on this platform (likely Wayland).")
-        print_error("Running in VIEWER-ONLY mode. Messages will NOT be auto-typed.")
-        print_error("Poll manually with: curl -s <server>/latest?n=5")
+    Exposes the attributes/methods that the agent uses on Windows:
+    .title, .isMinimized, .restore(), .activate(). Window identity is
+    tracked by the hex id wmctrl prints in column 1, which is stable
+    across title changes — same property that the Windows handle has."""
+
+    def __init__(self, wid, title):
+        self.wid = wid
+        self.title = title
+        self.isMinimized = False  # wmctrl -i -a restores as a side effect
+
+    def restore(self):
+        pass
+
+    def activate(self):
+        subprocess.run(
+            ["wmctrl", "-i", "-a", self.wid],
+            capture_output=True, timeout=5
+        )
+
+
+def _linux_list_windows():
+    """Return list of _LinuxWmctrlWindow for the current X11 session, or None
+    if wmctrl is missing / not on X11. Uses wmctrl -lp so we also skip dock
+    and sticky windows (desktop == -1)."""
+    if not IS_LINUX:
         return None
-
     try:
-        all_windows = gw.getAllWindows()
-    except Exception as e:
-        print_error(f"Window enumeration failed ({e}). Running in VIEWER-ONLY mode.")
-        print_error("Poll manually with: curl -s <server>/latest?n=5")
+        result = subprocess.run(
+            ["wmctrl", "-lp"], capture_output=True, text=True, timeout=5
+        )
+    except FileNotFoundError:
+        return None
+    except subprocess.TimeoutExpired:
+        return None
+    if result.returncode != 0:
         return None
 
     windows = []
+    for line in result.stdout.splitlines():
+        parts = line.split(None, 4)
+        if len(parts) < 5:
+            continue
+        wid, desktop, pid, host, title = parts
+        if desktop == "-1":
+            # sticky / dock / panel — not something Claude Code runs in
+            continue
+        windows.append(_LinuxWmctrlWindow(wid, title))
+    return windows
+
+
+def pick_claude_window():
+    """Show numbered list of windows. User picks once, then fully autonomous.
+
+    Backend selection:
+      - Windows: pygetwindow (enumerates + activates native win32 windows).
+      - Linux (X11): wmctrl -lp for enumeration, wmctrl -i -a for activation,
+        pyautogui.write() for typing — no xdotool, no xclip, no clipboard.
+      - Linux (Wayland, or wmctrl missing): return None → viewer-only mode.
+    """
+    if IS_LINUX:
+        all_windows = _linux_list_windows()
+        if all_windows is None:
+            print_error("wmctrl not available or not an X11 session.")
+            print_error("Running in VIEWER-ONLY mode. Messages will NOT be auto-typed.")
+            print_error("Poll manually with: curl -s <server>/latest?n=5")
+            return None
+    else:
+        if not GW_AVAILABLE:
+            print_error("pygetwindow unavailable on this platform.")
+            print_error("Running in VIEWER-ONLY mode. Messages will NOT be auto-typed.")
+            print_error("Poll manually with: curl -s <server>/latest?n=5")
+            return None
+        try:
+            raw_windows = gw.getAllWindows()
+        except Exception as e:
+            print_error(f"Window enumeration failed ({e}). Running in VIEWER-ONLY mode.")
+            print_error("Poll manually with: curl -s <server>/latest?n=5")
+            return None
+        all_windows = [w for w in raw_windows if w.visible]
+
+    windows = []
     for w in all_windows:
-        t = w.title.strip()
-        if t and w.visible and "waggle_icq" not in t.lower():
+        t = (w.title or "").strip()
+        if t and "waggle_icq" not in t.lower():
             windows.append(w)
 
     if not windows:
@@ -263,16 +335,23 @@ def type_into_claude(window, message):
         print_error("Poll manually with: curl -s <server>/latest?n=5")
         return False
     try:
+        if IS_LINUX:
+            # X11 path: wmctrl activates, pyautogui.write types directly via
+            # Xlib. No clipboard involved — works without xclip/xsel/wl-copy.
+            window.activate()
+            time.sleep(0.5)
+            pyautogui.write(message, interval=0.005)
+            time.sleep(0.2)
+            pyautogui.press("enter")
+            return True
+
+        # Windows path: clipboard paste via Ctrl+V.
         if window.isMinimized:
             window.restore()
         window.activate()
         time.sleep(0.5)
-
         pyperclip.copy(message)
-        if IS_LINUX:
-            pyautogui.hotkey("ctrl", "shift", "v")
-        else:
-            pyautogui.hotkey("ctrl", "v")
+        pyautogui.hotkey("ctrl", "v")
         time.sleep(0.3)
         pyautogui.press("enter")
         return True
