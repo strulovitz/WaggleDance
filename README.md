@@ -14,10 +14,18 @@
 
 **Terminal 1 — WaggleDance Server:**
 1. Open a terminal window
-2. Step into the folder, then run `./sync.sh` (the only sync rule — see section above):
+2. Run these commands (git pull gets latest code):
 ```
 cd C:\Users\nir_s\Projects\WaggleDance
 ```
+```
+git pull
+```
+⚠️ **If `git pull` opens a scary full-screen text editor** (black screen with `~` symbols on the left, or a message about "merge commit"), that is the vim editor asking you to confirm a merge message. To escape:
+- Press the **Esc** key
+- Type `:wq` (colon, w, q — exactly those three characters)
+- Press **Enter**
+- The editor will close and the pull will finish normally.
 
 3. **⚠️ WINDOWS ONLY — Free port 8765 from Hyper-V / WinNAT first.** Skip this step entirely on Linux.
 
@@ -75,10 +83,18 @@ python waggle_icq.py --server http://localhost:8765 --me laptop-claude --watch d
 
 **Terminal 2 — ICQ Chat Viewer + Agent:**
 1. Open a second terminal window
-2. Step into the folder, then run `./sync.sh` (the only sync rule — see section above):
+2. Run these commands (git pull gets latest code):
 ```
 cd C:\Users\nir_s\Projects\WaggleDance
 ```
+```
+git pull
+```
+⚠️ **If `git pull` opens a scary full-screen text editor** (black screen with `~` symbols on the left, or a message about "merge commit"), that is the vim editor asking you to confirm a merge message. To escape:
+- Press the **Esc** key
+- Type `:wq` (colon, w, q — exactly those three characters)
+- Press **Enter**
+- The editor will close and the pull will finish normally.
 
 3. Run this command:
 ```
