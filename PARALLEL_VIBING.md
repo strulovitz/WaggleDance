@@ -29,7 +29,7 @@ Goal: **Nir is never idle.** Whoever is ready to consume Nir's attention gets it
 | Machine | Location | OS | Track | Work |
 |---|---|---|---|---|
 | **Desktop** | Living room | Windows 11 | **Testing** | KillerBee Phase 3+: 3-DwarfQueen parallel, GiantQueen 3-level layer, fault tolerance |
-| **Laptop** | Bedroom | Windows 11 | **Videos** | BeeSting Part 1/10 (Big Tech) — scripts, elements, OpenArt production |
+| **Laptop** | Bedroom | Windows 11 | **Videos** | BeeSting Part 1/14 (Hive Drones) — finish 5 remaining priority-11 elements, then shot production. Script LOCKED 2026-04-13, 13/18 elements locked. |
 
 Each Claude owns its track and does not reach into the other's work. Coordination is purely "come to my room next" signaling.
 
@@ -45,6 +45,18 @@ Once this works on Windows, extend to Linux (Mint 22.2 on Desktop, Debian 13 on 
   - Laptop reboots into **Linux Debian** → Claude Code Laptop Linux installs VMs + LLMs for the Laptop side of the testing cluster.
 
 The physical machine does not dictate the track. The **OS boot choice** does. Each Claude Code instance, regardless of which machine or OS it runs on, can talk to the currently-active Claude on the other machine via WaggleDance ICQ.
+
+### 2.3 OS switches end one Claude and start another
+
+When a physical machine reboots from one OS into the other (Windows <-> Linux), the Claude Code session on that machine **ends**. A fresh Claude Code session starts on the new OS, with **no conversation history** and — importantly — with **empty auto-memory**, because auto-memory lives under `C:\Users\nir_s\.claude\...` on Windows and `~/.claude/...` on Linux. These are separate directories.
+
+The new Claude must bootstrap itself from the repos alone. The entry point for that is `WaggleDance/FRESH_CLAUDE_START_HERE.md` — it loads the minimum rules that would otherwise have come from auto-memory (no reward hacking, ask don't guess, ASCII only, etc.) and points to the rest of the docs in reading order. Every Linux Claude session on this project must start by reading that file.
+
+Handoff ritual when the outgoing Claude knows a reboot is coming:
+1. Outgoing Claude commits and pushes any in-progress work to the relevant repo.
+2. Outgoing Claude sends a single ICQ REPLY to the other machine's Claude stating "Desktop is rebooting into Linux now, state committed as <commit>, mission is <X>, the new Claude should read FRESH_CLAUDE_START_HERE then <mission-doc>."
+3. Nir reboots. Outgoing Claude session ends.
+4. New Claude starts on the new OS, is pointed at `FRESH_CLAUDE_START_HERE.md`, does the handshake, and takes over.
 
 ## 3. Coordination Protocol
 
@@ -133,3 +145,4 @@ If any of these fail, revisit this doc and update the protocol. This is a living
 ## 8. Changelog
 
 - **2026-04-14** — Initial version. Written by Desktop Claude (Opus 4.6, Windows 11) during Windows phase. Laptop Claude to confirm on ICQ.
+- **2026-04-14 (fix)** — Corrected today's Laptop assignment from "Part 1/10 Big Tech" to "Part 1/14 Hive Drones." Root cause: Desktop Claude wrote from stale auto-memory that still reflected the old /10 slate. Per PART_SLATE_EXPANSION.md (2026-04-13) the slate is now /14 with Pentagon split into 2A/B/C and Pharma split into 8A/B/C; Big Tech moved from Part 1 to Part 6. Part 1 is Hive Drones, script LOCKED, 13/18 elements locked. Caught by Laptop Claude on the handshake REPLY — exactly the kind of cross-check this methodology is supposed to produce. Lesson: before quoting track status in this doc, read the track's source-of-truth file (SERIES_BIBLE.md + PART_SLATE_EXPANSION.md + PART_1_ELEMENTS.md), do not trust auto-memory summaries for anything numeric or status-related.
