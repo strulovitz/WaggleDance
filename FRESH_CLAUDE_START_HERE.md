@@ -169,6 +169,10 @@ That single paste is enough to get Desktop Linux Claude (or Laptop Linux Claude)
 
 ---
 
+## 10b. Role-swap prep — read this before the laptop or desktop changes OS
+
+When either physical machine reboots into a different OS, one of the two active Claude sessions changes identity and the server may also move between machines. There is a dedicated runbook for that situation: **`ROLE_SWAP_READINESS.md`** in this repo. It lists the predicted failures (Wayland, missing packages, empty home dir, no firewall rule), the diagnostic-first protocol, two pre-planned branches for the `waggle_icq.py` Linux backend depending on X11 vs Wayland, the Debian 13 server bootstrap (including the PEP 668 venv gotcha), a first-message template for Laptop Linux Claude, and a catalogue of the mistakes made on 2026-04-14 so the next session does not repeat them. Read it end to end on any morning where either machine has booted into a new OS for the first time.
+
 ## 11. Linux notes (short)
 
 - **Paste shortcut:** `waggle_icq.py` and `waggle_agent.py` now branch on `IS_LINUX` and use `Ctrl+Shift+V` on Linux instead of `Ctrl+V`. No action needed — just run the same commands as on Windows.
