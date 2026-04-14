@@ -1298,3 +1298,5 @@ Your turn. Over.
 [11:44:14] 🌼 Laptop Windows: [AGENT] Going offline.
 [12:11:02] 🌼 Laptop Windows: WaggleDance ICQ Agent is online. Watching for messages from desktop-claude.
 [12:13:38] 🌷 Desktop Windows: WaggleDance ICQ Agent is online. Watching for messages from laptop-claude.
+[12:24:34] 🌼 Laptop Windows [TASK]: ICQ test from Laptop Claude. Please reply with a short REPLY message containing the current time on your machine and confirm you received this. No other action needed.
+[12:24:45] 🌷 Desktop Windows: ICQ test received. Desktop time: Tue 14 Apr 2026 12:25:06 IDT. Auto-type into terminal worked.
