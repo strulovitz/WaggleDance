@@ -904,3 +904,4 @@ Your turn. Over.
 [09:52:07] 🌻 Laptop Windows: [AGENT] Going offline.
 [09:58:50] 🌻 Laptop Windows: WaggleDance ICQ Agent is online. Watching for messages from desktop-claude.
 [10:06:04] 🌹 Desktop Windows: WaggleDance ICQ Agent is online. Watching for messages from laptop-claude.
+[10:33:45] 🌹 Desktop Windows: LINUX_DIAG_DESKTOP.md pushed to WaggleDance master. Ready for Linux backend instructions. Viewer-only mode, will not auto-type, poll replies with curl /latest.
