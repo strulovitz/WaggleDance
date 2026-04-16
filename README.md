@@ -44,12 +44,32 @@ git pull
    - Close the admin terminal. You can now go back to the normal WaggleDance terminal for the next step.
    - **On Linux: skip this entirely.** Linux does not have Hyper-V reserving ports — the problem does not exist there.
 
-4. Run this command:
+4. **⚠️ WINDOWS ONLY — Make sure the firewall allows port 8765 from the LAN.** Skip this step entirely on Linux.
+
+   **Why this step exists:** Windows Firewall can have hidden block rules (like "Smart Connect" from ASUS utilities) that override the WaggleDance allow rule. This step disables those blockers and re-creates a clean allow rule every morning. It is safe to run every day — it does nothing if the rule already exists and no blockers are active.
+
+   **How to do it:** In the same **Admin Command Prompt** from step 3, run these three commands one at a time:
+   ```
+   powershell -command "Get-NetFirewallRule -DisplayName 'Smart Connect' -ErrorAction SilentlyContinue | Disable-NetFirewallRule"
+   ```
+   ```
+   netsh advfirewall firewall delete rule name="WaggleDance" >nul 2>&1
+   ```
+   ```
+   netsh advfirewall firewall add rule name="WaggleDance" dir=in action=allow protocol=TCP localport=8765 profile=any
+   ```
+   - The first command disables any ASUS Smart Connect block rules that might override our allow rule.
+   - The second command deletes the old WaggleDance rule (if it exists) so we start clean.
+   - The third command creates a fresh allow rule for port 8765 on ALL profiles (Private, Public, Domain).
+   - You should see "Ok." after the third command.
+   - **On Linux: skip this entirely.** Linux does not have Windows Firewall.
+
+5. Run this command:
 ```
 python waggle_server.py
 ```
-5. You should see "WaggleDance server starting on port 8765..." If instead you see *"An attempt was made to access a socket in a way forbidden by its access permissions"*, it means HNS grabbed 8765 again after you bounced WinNAT (rare but possible). Repeat step 3 and try again.
-6. Leave this terminal open. Do not close it.
+6. You should see "WaggleDance server starting on port 8765..." If instead you see *"An attempt was made to access a socket in a way forbidden by its access permissions"*, it means HNS grabbed 8765 again after you bounced WinNAT (rare but possible). Repeat step 3 and try again.
+7. Leave this terminal open. Do not close it.
 
 **Terminal 2 — Claude Code:**
 1. Open a second terminal window
