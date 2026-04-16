@@ -46,22 +46,17 @@ git pull
 
 4. **⚠️ WINDOWS ONLY — Make sure the firewall allows port 8765 from the LAN.** Skip this step entirely on Linux.
 
-   **Why this step exists:** Windows Firewall can have hidden block rules (like "Smart Connect" from ASUS utilities) that override the WaggleDance allow rule. This step disables those blockers and re-creates a clean allow rule every morning. It is safe to run every day — it does nothing if the rule already exists and no blockers are active.
+   **Why this step exists:** Windows Firewall sometimes blocks port 8765 from other machines on the LAN even when the server works locally. This step ensures the port is always open. Safe to run every day.
 
-   **How to do it:** In the same **Admin Command Prompt** from step 3, run these three commands one at a time:
+   **How to do it:** In the same **Admin Command Prompt** from step 3, run these two commands one at a time:
    ```
-   powershell -command "Get-NetFirewallRule -DisplayName 'Smart Connect' -ErrorAction SilentlyContinue | Disable-NetFirewallRule"
-   ```
-   ```
-   netsh advfirewall firewall delete rule name="WaggleDance" >nul 2>&1
+   netsh advfirewall firewall delete rule name="WaggleDance"
    ```
    ```
    netsh advfirewall firewall add rule name="WaggleDance" dir=in action=allow protocol=TCP localport=8765 profile=any
    ```
-   - The first command disables any ASUS Smart Connect block rules that might override our allow rule.
-   - The second command deletes the old WaggleDance rule (if it exists) so we start clean.
-   - The third command creates a fresh allow rule for port 8765 on ALL profiles (Private, Public, Domain).
-   - You should see "Ok." after the third command.
+   - If the delete says "No rules match" that is fine — it just means no old rule existed.
+   - You should see "Ok." after the second command.
    - **On Linux: skip this entirely.** Linux does not have Windows Firewall.
 
 5. Run this command:
