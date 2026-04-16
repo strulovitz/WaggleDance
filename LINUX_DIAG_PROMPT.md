@@ -138,12 +138,12 @@ If `git push` asks for credentials or errors out, send Nir a plain-text question
 
 ## Step 5 — Send exactly ONE ICQ REPLY to Laptop Claude
 
-The WaggleDance server is on Laptop at `http://10.0.0.1:8765`. ASCII only — no em-dashes, no smart quotes, no emojis, no arrows, no ellipses. If you write a non-ASCII character the Flask server will return `400 Bad Request`.
+The WaggleDance server is on Laptop at `http://10.0.0.4:8765`. ASCII only — no em-dashes, no smart quotes, no emojis, no arrows, no ellipses. If you write a non-ASCII character the Flask server will return `400 Bad Request`.
 
 Run this command exactly as written:
 
 ```
-curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "LINUX_DIAG_DESKTOP.md pushed to WaggleDance master. Ready for Linux backend instructions. Viewer-only mode, will not auto-type, poll replies with curl /latest."}'
+curl -s -X POST http://10.0.0.4:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "LINUX_DIAG_DESKTOP.md pushed to WaggleDance master. Ready for Linux backend instructions. Viewer-only mode, will not auto-type, poll replies with curl /latest."}'
 ```
 
 You should see a response like `{"id":<number>,"ok":true}`. If you see anything else (especially `400 Bad Request`), stop and send Nir a plain-text question with the exact response.

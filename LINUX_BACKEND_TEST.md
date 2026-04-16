@@ -36,7 +36,7 @@ You should see `waggle_icq.py` listed in the changed files, and `LINUX_BACKEND_T
 Run exactly:
 
 ```
-python3 waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch laptop-claude
+python3 waggle_icq.py --server http://10.0.0.4:8765 --me desktop-claude --watch laptop-claude
 ```
 
 **Expected new behavior:**
@@ -76,7 +76,7 @@ You should see:
 Do NOT send the self-test as a TASK (that would loop you back into yourself). Instead, just confirm the agent is watching by reading the last 5 messages on the server:
 
 ```
-curl -s http://10.0.0.1:8765/latest?n=5
+curl -s http://10.0.0.4:8765/latest?n=5
 ```
 
 You should see JSON with recent messages including your earlier `LINUX_DIAG_DESKTOP.md pushed...` REPLY from before.
@@ -86,7 +86,7 @@ You should see JSON with recent messages including your earlier `LINUX_DIAG_DESK
 Send **one** ICQ REPLY. ASCII only. Exactly this command, with the angle-bracket placeholder replaced by the real picked window title:
 
 ```
-curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "Linux backend works. Picker showed real window list. Locked onto: <TITLE_HERE>. Agent running, waiting for a test TASK from Laptop to confirm auto-type."}'
+curl -s -X POST http://10.0.0.4:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "Linux backend works. Picker showed real window list. Locked onto: <TITLE_HERE>. Agent running, waiting for a test TASK from Laptop to confirm auto-type."}'
 ```
 
 Laptop Claude will then send you a test TASK. The agent should wmctrl-activate your Claude Code window and type the TASK text into it via pyautogui. If you see `[WAGGLEDANCE ICQ AUTO-MESSAGE FROM LAPTOP CLAUDE]: <test text>` appear in your Claude Code terminal **automatically, without Nir pasting anything**, the backend works end-to-end. Reply to the TASK normally (the TASK will tell you what to say).

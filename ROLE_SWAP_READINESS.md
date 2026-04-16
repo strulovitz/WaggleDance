@@ -2,9 +2,9 @@
 
 **Who this is for:** whichever Claude Code session wakes up first after Nir swaps OS roles so that **Laptop runs Debian 13 GNOME** and **Desktop runs Windows 11**. This file exists so you do not have to rediscover everything we learned on the opposite configuration. Read it end to end before touching anything.
 
-**Current working configuration (2026-04-14 morning, for reference only):** Laptop = Windows 11, Desktop = Linux Mint 22.2 Cinnamon X11. In that configuration the WaggleDance server runs on Laptop Windows at `http://10.0.0.1:8765`, the Linux backend for `waggle_icq.py` uses `wmctrl` + `pyautogui.write`, and it is verified end-to-end (TASK #150, `AUTOTYPE_OK 57`, commit `848ab53`).
+**Current working configuration (2026-04-14 morning, for reference only):** Laptop = Windows 11, Desktop = Linux Mint 22.2 Cinnamon X11. In that configuration the WaggleDance server runs on Laptop Windows at `http://10.0.0.4:8765`, the Linux backend for `waggle_icq.py` uses `wmctrl` + `pyautogui.write`, and it is verified end-to-end (TASK #150, `AUTOTYPE_OK 57`, commit `848ab53`).
 
-**After the swap:** the server will need to run on **Laptop Debian 13 Linux** at `http://10.0.0.1:8765`, and the Desktop Windows Claude will connect to it as a client. The network IPs stay the same — IPs are assigned to physical machines, not to the OS they boot into.
+**After the swap:** the server will need to run on **Laptop Debian 13 Linux** at `http://10.0.0.4:8765`, and the Desktop Windows Claude will connect to it as a client. The network IPs stay the same — IPs are assigned to physical machines, not to the OS they boot into.
 
 ---
 
@@ -18,7 +18,7 @@ Predict these, do not be surprised by them:
 
 3. **Flask / pyautogui / pyperclip may not be installed** on Laptop Linux. Mint 22.2 on Desktop happened to already have `pyautogui` and `pyperclip` installed. Debian 13 is a different distro and that is not guaranteed. The WaggleDance **server** itself needs only Flask — that is the critical dependency, because if the server does not start, nothing else can run. See §4.
 
-4. **No firewall rule for port 8765 on Laptop Linux yet.** Mint had `ufw` either disabled or already permissive on the Desktop (we did not have to configure it). Debian 13 may ship with `ufw` inactive too, but verify — if Laptop Linux has a firewall blocking 8765, Desktop Windows Claude will see connection refused from 10.0.0.1 and nothing will work.
+4. **No firewall rule for port 8765 on Laptop Linux yet.** Mint had `ufw` either disabled or already permissive on the Desktop (we did not have to configure it). Debian 13 may ship with `ufw` inactive too, but verify — if Laptop Linux has a firewall blocking 8765, Desktop Windows Claude will see connection refused from 10.0.0.4 and nothing will work.
 
 5. **No `winnat` problem on Laptop Linux.** Linux does not have Hyper-V randomly reserving ports at boot, so the whole `net stop winnat / net start winnat` ritual is irrelevant on Laptop when it is Linux. Do not try to run it. Desktop Windows **will** still need the winnat bounce **only if** it is hosting the server, which it is not in this configuration (it is a pure client), so the winnat step can also be skipped on Desktop this time around. The server lives on Laptop Linux and Linux has no HNS.
 
@@ -87,7 +87,7 @@ There is **no clean off-the-shelf solution** for window enumeration and syntheti
 
 ## 4. Starting the WaggleDance server on Laptop Linux (Debian 13)
 
-The server must run on Laptop because both first-message templates hard-code `http://10.0.0.1:8765` (Laptop's LAN IP). Even after the OS swap, IP does not move.
+The server must run on Laptop because both first-message templates hard-code `http://10.0.0.4:8765` (Laptop's LAN IP). Even after the OS swap, IP does not move.
 
 ### 4a. One-time Debian 13 bootstrap (first boot only)
 
@@ -165,7 +165,7 @@ Save, then:
 sudo systemctl daemon-reload && sudo systemctl restart ollama
 ```
 
-And verify: `curl http://10.0.0.1:11434/api/tags` from Desktop should return JSON. This only matters for the testing track, not for WaggleDance itself — skip it on day 1 of the swap and come back to it when the testing track resumes.
+And verify: `curl http://10.0.0.4:11434/api/tags` from Desktop should return JSON. This only matters for the testing track, not for WaggleDance itself — skip it on day 1 of the swap and come back to it when the testing track resumes.
 
 ---
 
@@ -193,13 +193,13 @@ If Nir's default terminal opens somewhere other than `~`, `cd ~` first, then run
 
 Desktop Windows was in the original README morning startup, so most of it still applies. Two things to be aware of:
 
-1. **Desktop is now the client, not the server.** The server lives on Laptop Linux at `10.0.0.1:8765`. Desktop Windows Claude connects to it with `http://10.0.0.1:8765` exactly like Laptop Windows did when Laptop was the server. No server start on Desktop. No `waggle_server.py` to run.
+1. **Desktop is now the client, not the server.** The server lives on Laptop Linux at `10.0.0.4:8765`. Desktop Windows Claude connects to it with `http://10.0.0.4:8765` exactly like Laptop Windows did when Laptop was the server. No server start on Desktop. No `waggle_server.py` to run.
 
 2. **The Windows auto-memory on Desktop is intact** (this machine has been Windows before), so Desktop Windows Claude starts with full project context already loaded. Laptop Linux Claude does NOT — Linux auto-memory on Laptop is an empty directory because this is the first Linux boot of the laptop. Laptop Linux Claude must read `FRESH_CLAUDE_START_HERE.md` §5 for the load-bearing rules until its memory populates.
 
-3. **First-message template for Desktop Windows Claude** is already in `README.md` under "For Desktop Claude Code (Windows)". Use it verbatim — the IP `10.0.0.1` is already correct because it points at Laptop, and Laptop is still at 10.0.0.1 regardless of which OS it booted.
+3. **First-message template for Desktop Windows Claude** is already in `README.md` under "For Desktop Claude Code (Windows)". Use it verbatim — the IP `10.0.0.4` is already correct because it points at Laptop, and Laptop is still at 10.0.0.4 regardless of which OS it booted.
 
-4. **ICQ on Desktop Windows** works exactly like before: `python waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch laptop-claude`, pick the Claude Code window number, done.
+4. **ICQ on Desktop Windows** works exactly like before: `python waggle_icq.py --server http://10.0.0.4:8765 --me desktop-claude --watch laptop-claude`, pick the Claude Code window number, done.
 
 ---
 
@@ -211,7 +211,7 @@ Paste this as the very first message to Laptop Linux Claude Code after boot. Adj
 You are Claude Code running on my Laptop, which I just booted into Debian 13 GNOME for the first time. This is a fresh session with no prior history on this OS. Your auto-memory is empty because auto-memory lives in a per-OS directory.
 
 Your role: laptop-linux-claude.
-Your tracks: (1) run the WaggleDance server on this machine so Desktop Windows Claude can connect to it at http://10.0.0.1:8765, and (2) if GNOME is on X11 (not Wayland) and wmctrl is installable, get the ICQ auto-type working so messages from Desktop auto-type into your Claude Code terminal.
+Your tracks: (1) run the WaggleDance server on this machine so Desktop Windows Claude can connect to it at http://10.0.0.4:8765, and (2) if GNOME is on X11 (not Wayland) and wmctrl is installable, get the ICQ auto-type working so messages from Desktop auto-type into your Claude Code terminal.
 
 Before touching the mission, bootstrap yourself:
 

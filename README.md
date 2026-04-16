@@ -118,7 +118,7 @@ git pull
 
 3. Run this command:
 ```
-python waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch laptop-claude
+python waggle_icq.py --server http://10.0.0.4:8765 --me desktop-claude --watch laptop-claude
 ```
 4. It will show a numbered list of windows. Type the NUMBER of the Claude Code window (from Terminal 1) and press Enter.
 5. You should see the flower header and "Agent running. Watching for messages..."
@@ -141,7 +141,7 @@ cd WaggleDance
 
 3. Run this command:
 ```
-python3 waggle_icq.py --server http://10.0.0.1:8765 --me desktop-claude --watch laptop-claude
+python3 waggle_icq.py --server http://10.0.0.4:8765 --me desktop-claude --watch laptop-claude
 ```
 4. You will see a numbered list of windows, same as on Windows. Type the NUMBER of the Claude Code window (from Terminal 1) and press Enter. The Claude Code window usually appears in the list with a title starting with `⠂ ...` (followed by the current conversation title).
 5. You should see `[SYSTEM] Locked onto: '<title>'` followed by the flower header and `Agent running. Watching for messages...`
@@ -169,30 +169,30 @@ Please read the GitHub repos at strulovitz to get full project context.
 
 **🖥️🪟 For Desktop Claude Code (Windows 11):**
 ```
-You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.1:8765. An ICQ agent is running that will type both TASK and REPLY messages from Laptop Claude into your terminal automatically. TASK means Laptop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM LAPTOP CLAUDE]:") is information for you.
+You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.4:8765. An ICQ agent is running that will type both TASK and REPLY messages from Laptop Claude into your terminal automatically. TASK means Laptop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM LAPTOP CLAUDE]:") is information for you.
 
 To send a message to Laptop Claude, use curl:
-- TASK (Laptop Claude must act on it): curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
-- REPLY (just information, no action needed): curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "YOUR INFO HERE"}'
-- To check for replies: curl -s http://10.0.0.1:8765/latest?n=5
+- TASK (Laptop Claude must act on it): curl -s -X POST http://10.0.0.4:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
+- REPLY (just information, no action needed): curl -s -X POST http://10.0.0.4:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "YOUR INFO HERE"}'
+- To check for replies: curl -s http://10.0.0.4:8765/latest?n=5
 
-Laptop IP is 10.0.0.1. Both machines have Ollama, Python, Flask, and all repos cloned.
+Laptop IP is 10.0.0.4. Both machines have Ollama, Python, Flask, and all repos cloned.
 
 Please read the GitHub repos at strulovitz to get full project context.
 ```
 
 **🖥️🐧 For Desktop Claude Code (Linux Mint 22.2 Cinnamon):**
 ```
-You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.1:8765. An ICQ agent is running on this Linux machine that will type both TASK and REPLY messages from Laptop Claude into your terminal automatically, exactly the same way it works on Windows. TASK means Laptop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM LAPTOP CLAUDE]:") is information for you.
+You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.4:8765. An ICQ agent is running on this Linux machine that will type both TASK and REPLY messages from Laptop Claude into your terminal automatically, exactly the same way it works on Windows. TASK means Laptop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM LAPTOP CLAUDE]:") is information for you.
 
 The Linux backend for the ICQ uses wmctrl for window enumeration and activation, plus pyautogui.write for keystroke injection via Xlib. No clipboard, no xdotool, no sudo. This only works under X11 (which Mint 22.2 Cinnamon uses by default) — if you are ever on Wayland it falls back to viewer-only mode and you will need to poll manually.
 
 To send a message to Laptop Claude, use curl (ASCII ONLY — no em-dashes, smart quotes, arrows, or emojis, they break the JSON):
-- TASK (Laptop Claude must act on it): curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
-- REPLY (just information, no action needed): curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "YOUR INFO HERE"}'
-- To check for replies: curl -s http://10.0.0.1:8765/latest?n=5
+- TASK (Laptop Claude must act on it): curl -s -X POST http://10.0.0.4:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
+- REPLY (just information, no action needed): curl -s -X POST http://10.0.0.4:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "YOUR INFO HERE"}'
+- To check for replies: curl -s http://10.0.0.4:8765/latest?n=5
 
-Laptop IP is 10.0.0.1. Desktop IP is 10.0.0.5. All repos are already cloned directly in the directory where your terminal opens by default on this Linux boot — WaggleDance, KillerBee, HoneycombOfAI, GiantHoneyBee, BeehiveOfAI, BeeSting, Honeymation, MadHoney, TheDistributedAIRevolution are all right there as immediate subfolders. Use relative paths (cd WaggleDance, cd KillerBee, etc.) — do not guess an absolute path.
+Laptop IP is 10.0.0.4. Desktop IP is 10.0.0.5. All repos are already cloned directly in the directory where your terminal opens by default on this Linux boot — WaggleDance, KillerBee, HoneycombOfAI, GiantHoneyBee, BeehiveOfAI, BeeSting, Honeymation, MadHoney, TheDistributedAIRevolution are all right there as immediate subfolders. Use relative paths (cd WaggleDance, cd KillerBee, etc.) — do not guess an absolute path.
 
 Before any real work, read WaggleDance/FRESH_CLAUDE_START_HERE.md end to end (sections 5, 6, 10b, and 11 are load-bearing for a Linux session), then WaggleDance/PARALLEL_VIBING.md, WaggleDance/WHEN_TO_USE_WAGGLEDANCE.md, and WaggleDance/LESSONS.md section 3 (the full story of the Linux backend). If you will be on a track that touches testing, also read KillerBee/PROJECT_REPORT.md. Then please read the GitHub repos at strulovitz to get full project context.
 ```
@@ -242,7 +242,7 @@ netsh advfirewall firewall add rule name="OllamaLAN" dir=in action=allow protoco
 6. Restart Ollama (right-click system tray icon > Quit, then reopen)
 
 ### Network Info
-- Laptop IP: 10.0.0.1
+- Laptop IP: 10.0.0.4
 - Desktop IP: 10.0.0.5
 - WaggleDance server port: 8765
 
@@ -289,16 +289,16 @@ Move your mouse to the top-left corner of the screen. pyautogui will abort.
 
 ```bash
 # Send a TASK (will be typed into the other Claude Code's terminal)
-curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "TASK", "message": "your instruction here"}'
+curl -s -X POST http://10.0.0.4:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "TASK", "message": "your instruction here"}'
 
 # Send a REPLY (will only show in ICQ viewer, not typed)
-curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "your info here"}'
+curl -s -X POST http://10.0.0.4:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "your info here"}'
 
 # Read new messages
-curl -s http://10.0.0.1:8765/read?since=25
+curl -s http://10.0.0.4:8765/read?since=25
 
 # Check latest messages
-curl -s http://10.0.0.1:8765/latest?n=5
+curl -s http://10.0.0.4:8765/latest?n=5
 ```
 
 ### Chat Logs

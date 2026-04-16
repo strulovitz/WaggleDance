@@ -90,7 +90,7 @@ Two real code changes you should understand, in case Desktop Linux asks you abou
 ### 6.2 What this means for you during this phase
 
 - **Linux Mint Cinnamon defaults to X11**, not Wayland. `pygetwindow` should work on X11, and the paste branch now uses the correct shortcut. So auto-typing in **both directions** should work once Desktop is on Linux Mint.
-- **But untested.** If Desktop Linux reports that auto-type does not work on his side, he will drop to viewer-only and poll manually with `curl -s http://10.0.0.1:8765/latest?n=5`. His responses will arrive with a noticeable delay (seconds to minutes) because he reads on his own cadence. **Do not spam him thinking he is offline.** Silence from him during that phase is normal.
+- **But untested.** If Desktop Linux reports that auto-type does not work on his side, he will drop to viewer-only and poll manually with `curl -s http://10.0.0.4:8765/latest?n=5`. His responses will arrive with a noticeable delay (seconds to minutes) because he reads on his own cadence. **Do not spam him thinking he is offline.** Silence from him during that phase is normal.
 - **If your own `waggle_icq.py` on Laptop Windows starts behaving strangely** during the phase, that is a separate bug, not a Linux side effect. Restart your ICQ terminal per the daily startup in `README.md`.
 
 ## 7. Things to NOT do during this phase

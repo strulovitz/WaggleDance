@@ -2,7 +2,7 @@
 
 **Status:** Active experiment, started 2026-04-14
 **Owner:** Nir Strulovitz
-**Channel:** WaggleDance ICQ (http://10.0.0.1:8765)
+**Channel:** WaggleDance ICQ (http://10.0.0.4:8765)
 **Applies to:** All project work (testing, videos, books, outreach, infra)
 
 ---

@@ -85,23 +85,23 @@ After the handshake, go silent on ICQ until a legitimate operational event fires
 
 ## 7. How to send an ICQ message (copy-paste reference)
 
-The WaggleDance server runs on **Laptop at `http://10.0.0.1:8765`** whenever Laptop is awake. From any other machine (Desktop Windows, Desktop Linux, Laptop Linux), use that URL. When you are *on* Laptop itself, use `http://localhost:8765`.
+The WaggleDance server runs on **Laptop at `http://10.0.0.4:8765`** whenever Laptop is awake. From any other machine (Desktop Windows, Desktop Linux, Laptop Linux), use that URL. When you are *on* Laptop itself, use `http://localhost:8765`.
 
 Replace `<your-role>` with one of: `laptop-claude`, `desktop-claude`. (The ICQ does not yet distinguish Windows vs Linux — the physical machine name is enough because only one OS is active per machine at a time.)
 
 **Send a REPLY (informational):**
 ```
-curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "<your-role>", "type": "REPLY", "message": "YOUR ASCII-ONLY MESSAGE HERE"}'
+curl -s -X POST http://10.0.0.4:8765/send -H "Content-Type: application/json" -d '{"from": "<your-role>", "type": "REPLY", "message": "YOUR ASCII-ONLY MESSAGE HERE"}'
 ```
 
 **Send a TASK (the other Claude must act):**
 ```
-curl -s -X POST http://10.0.0.1:8765/send -H "Content-Type: application/json" -d '{"from": "<your-role>", "type": "TASK", "message": "YOUR ASCII-ONLY MESSAGE HERE"}'
+curl -s -X POST http://10.0.0.4:8765/send -H "Content-Type: application/json" -d '{"from": "<your-role>", "type": "TASK", "message": "YOUR ASCII-ONLY MESSAGE HERE"}'
 ```
 
 **Check for recent messages:**
 ```
-curl -s http://10.0.0.1:8765/latest?n=5
+curl -s http://10.0.0.4:8765/latest?n=5
 ```
 
 A successful send returns `{"id":<number>,"ok":true}`. A `400 Bad Request` means you put a non-ASCII character in the payload — fix and retry.
@@ -158,7 +158,7 @@ Before touching the mission, bootstrap yourself:
    - KillerBee/CLAUDE.md (Rule 1 and Rule 2 are load-bearing)
    - KillerBee/PROJECT_REPORT.md (latest state, especially "What Has NOT Been Done")
    - KillerBee/PHASE3_LINUX_VM_SETUP.md (this is your runbook)
-3. Send one ICQ REPLY on WaggleDance to laptop-claude announcing: role, track, repos synced, docs read, ready to start at section 4 of PHASE3_LINUX_VM_SETUP.md. Use the ASCII-only curl format from FRESH_CLAUDE_START_HERE section 7. The WaggleDance server is on the Laptop at http://10.0.0.1:8765.
+3. Send one ICQ REPLY on WaggleDance to laptop-claude announcing: role, track, repos synced, docs read, ready to start at section 4 of PHASE3_LINUX_VM_SETUP.md. Use the ASCII-only curl format from FRESH_CLAUDE_START_HERE section 7. The WaggleDance server is on the Laptop at http://10.0.0.4:8765.
 4. Report back to me in plain text summarizing what you read and confirm you are ready.
 5. Wait for me to say "go" before running any real commands on the system.
 
