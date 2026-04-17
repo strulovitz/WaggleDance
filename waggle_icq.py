@@ -94,9 +94,9 @@ def get_emoji(sender):
 
 def get_display_name(sender):
     if "laptop" in sender.lower():
-        return "Laptop Windows"
+        return "Laptop Linux" if IS_LINUX else "Laptop Windows"
     elif "desktop" in sender.lower():
-        return "Desktop Windows"
+        return "Desktop Linux" if IS_LINUX else "Desktop Windows"
     return sender
 
 

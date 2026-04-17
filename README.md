@@ -10,6 +10,18 @@
 
 **Do this every morning. Follow the order exactly.**
 
+### ⚠️ IP ADDRESS NOTE
+
+The Laptop has **different IP addresses depending on which OS is booted:**
+- **Laptop Windows 11:** `10.0.0.4`
+- **Laptop Linux (Debian 13):** `10.0.0.8`
+
+When Laptop is the server, Desktop must connect to whichever IP matches the currently-booted OS. Check the sections below — each one tells you the correct IP.
+
+---
+
+**Pick the section that matches how Laptop is booted right now.**
+
 ### 💻🪟 LAPTOP — if booted into Windows 11 (do this first)
 
 **Terminal 1 — WaggleDance Server:**
@@ -85,9 +97,60 @@ python waggle_icq.py --server http://localhost:8765 --me laptop-claude --watch d
 5. You should see the flower header and "Agent running. Watching for messages..."
 6. Leave this terminal open. Do not close it.
 
+### 💻🐧 LAPTOP — if booted into Debian 13 Linux (do this first)
+
+**Laptop Linux IP: `10.0.0.8`** (not 10.0.0.4 — that is the Windows IP)
+
+**Terminal 1 — WaggleDance Server:**
+1. Open a terminal window
+2. Run these commands:
+```
+cd ~/WaggleDance
+```
+```
+git pull
+```
+⚠️ **If `git pull` opens a scary full-screen text editor** (black screen with `~` symbols on the left, or a message about "merge commit"), that is the vim editor asking you to confirm a merge message. To escape:
+- Press the **Esc** key
+- Type `:wq` (colon, w, q — exactly those three characters)
+- Press **Enter**
+- The editor will close and the pull will finish normally.
+
+3. Run this command to start the server:
+```
+~/waggle-venv/bin/python3 waggle_server.py
+```
+4. You should see "WaggleDance server starting on port 8765..." If instead you see "Address already in use", find the old process with `ss -tlnp | grep 8765` and kill it by PID, then try again.
+5. Leave this terminal open. Do not close it.
+
+**Terminal 2 — Claude Code:**
+1. Open a second terminal window
+2. Start Claude Code as you normally do
+3. Leave this terminal open. Do not close it.
+
+**Terminal 3 — ICQ Chat Viewer + Agent:**
+1. Open a third terminal window
+2. Run this command:
+```
+cd ~/WaggleDance
+```
+3. Run this command:
+```
+~/waggle-venv/bin/python3 waggle_icq.py --server http://localhost:8765 --me laptop-claude --watch desktop-claude
+```
+4. It will show a numbered list of windows. Type the NUMBER of the Claude Code window (from Terminal 2) and press Enter.
+5. You should see the flower header and "Agent running. Watching for messages..."
+6. Leave this terminal open. Do not close it.
+
+---
+
 ### 🖥️ DESKTOP (do this second)
 
 **Pick the section that matches how Desktop is booted right now.** The folder path and the ICQ behavior are different on Windows vs Linux.
+
+**⚠️ IMPORTANT:** The server URL depends on which OS Laptop is running:
+- If Laptop is **Windows**: `http://10.0.0.4:8765`
+- If Laptop is **Debian 13 Linux**: `http://10.0.0.8:8765`
 
 #### 🖥️🪟 DESKTOP — if booted into Windows 11
 
@@ -162,7 +225,23 @@ Desktop IP is 10.0.0.5. Desktop has Ollama with llama3.2:3b. Desktop has Honeyco
 Please read the GitHub repos at strulovitz to get full project context.
 ```
 
-**🖥️🪟 For Desktop Claude Code (Windows 11):**
+**💻🐧 For Laptop Claude Code (Debian 13 Linux):**
+```
+You are connected to WaggleDance — a communication system that lets you talk to Desktop Claude Code autonomously. The WaggleDance server runs on this machine at http://localhost:8765. An ICQ agent is running on this Linux machine that will type both TASK and REPLY messages from Desktop Claude into your terminal automatically. TASK means Desktop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM DESKTOP CLAUDE]:") is information for you.
+
+The Linux backend for the ICQ uses wmctrl for window enumeration and activation, plus pyautogui.write for keystroke injection via Xlib. No clipboard, no xdotool, no sudo. This only works under X11 (which this Debian 13 GNOME session uses) — if you are ever on Wayland it falls back to viewer-only mode.
+
+To send a message to Desktop Claude, use curl (ASCII ONLY — no em-dashes, smart quotes, arrows, or emojis, they break the JSON):
+- TASK (Desktop Claude must act on it): curl -s -X POST http://localhost:8765/send -H "Content-Type: application/json" -d '{"from": "laptop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
+- REPLY (just information, no action needed): curl -s -X POST http://localhost:8765/send -H "Content-Type: application/json" -d '{"from": "laptop-claude", "type": "REPLY", "message": "YOUR INFO HERE"}'
+- To check for replies: curl -s http://localhost:8765/latest?n=5
+
+Desktop IP is 10.0.0.5. Laptop Linux IP is 10.0.0.8. All repos are cloned in ~/. Use ~/waggle-venv/bin/python3 for running WaggleDance scripts.
+
+Please read the GitHub repos at strulovitz to get full project context.
+```
+
+**🖥️🪟 For Desktop Claude Code (Windows 11) — when Laptop is WINDOWS:**
 ```
 You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.4:8765. An ICQ agent is running that will type both TASK and REPLY messages from Laptop Claude into your terminal automatically. TASK means Laptop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM LAPTOP CLAUDE]:") is information for you.
 
@@ -172,6 +251,20 @@ To send a message to Laptop Claude, use curl:
 - To check for replies: curl -s http://10.0.0.4:8765/latest?n=5
 
 Laptop IP is 10.0.0.4. Both machines have Ollama, Python, Flask, and all repos cloned.
+
+Please read the GitHub repos at strulovitz to get full project context.
+```
+
+**🖥️🪟 For Desktop Claude Code (Windows 11) — when Laptop is LINUX (Debian 13):**
+```
+You are connected to WaggleDance — a communication system that lets you talk to Laptop Claude Code autonomously. The WaggleDance server runs on the Laptop at http://10.0.0.8:8765 (Laptop is on Debian 13 Linux today, IP 10.0.0.8). An ICQ agent is running that will type both TASK and REPLY messages from Laptop Claude into your terminal automatically. TASK means Laptop needs you to act. REPLY (prefixed with "[WAGGLEDANCE ICQ AUTO-MESSAGE FROM LAPTOP CLAUDE]:") is information for you.
+
+To send a message to Laptop Claude, use curl:
+- TASK (Laptop Claude must act on it): curl -s -X POST http://10.0.0.8:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "TASK", "message": "YOUR INSTRUCTION HERE"}'
+- REPLY (just information, no action needed): curl -s -X POST http://10.0.0.8:8765/send -H "Content-Type: application/json" -d '{"from": "desktop-claude", "type": "REPLY", "message": "YOUR INFO HERE"}'
+- To check for replies: curl -s http://10.0.0.8:8765/latest?n=5
+
+Laptop IP is 10.0.0.8 (Linux). Desktop IP is 10.0.0.5. Both machines have Ollama, Python, Flask, and all repos cloned.
 
 Please read the GitHub repos at strulovitz to get full project context.
 ```
@@ -237,7 +330,8 @@ netsh advfirewall firewall add rule name="OllamaLAN" dir=in action=allow protoco
 6. Restart Ollama (right-click system tray icon > Quit, then reopen)
 
 ### Network Info
-- Laptop IP: 10.0.0.4
+- Laptop IP (Windows): 10.0.0.4
+- Laptop IP (Linux/Debian 13): 10.0.0.8
 - Desktop IP: 10.0.0.5
 - WaggleDance server port: 8765
 
