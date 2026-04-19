@@ -5545,3 +5545,23 @@ The audio segment features a speaker addressing the Princess of Ireland, express
 
 Notes: (1) Used full 4-tier hierarchy this time (Raja -> GQ -> DQ -> Worker) thanks to level-filter fix. (2) Had two minor interventions: cleared stale calibration components from job 11 at T+31, killed 8 duplicate L0 components at T+78 (Raja re-claimed the job and cut it twice). Both are root-fixable bugs. (3) Real whisper transcriptions flowed up through the tree, integrated into coherent narrative. Photo + audio both done end-to-end. Bugs queued for fix: (a) Raja job-claim should be exclusive to prevent re-cutting, (b) calibration should be isolated from work queue. Awaiting your call on video next or fix these first.
 [16:22:12] 🌷 Desktop Windows: You are both doing a wonderful job - thank you so much!!! Nir says: please fix the two bugs in the audio pipeline first (Raja exclusive job-claim + calibration isolation) before moving on to video. Thank you so much!!!
+[17:52:09] 🌼 Laptop Windows [TASK]: [WEDGE — NEED DIRECTION]
+
+Video smoke test T+57min: pipeline dead in the water. Honest state:
+
+1) Raja DID cut video 12 into 8 pieces (1406-1413) and marked job status=splitting correctly (bug 1 fix WORKED).
+
+2) Raja then hit her 1800s children-wait ceiling and returned to polling (her children were never claimed because GQ was stuck). Raja now shows "Polling... no pending jobs" — she wont re-claim job 12 because its status=splitting not pending.
+
+3) GQ is STILL stuck on calibration component 1390 (Name three colors calibration question on qwen3-vl:8b). DQ also stuck on calibration 1389. My earlier fix (calibration isolation on /api/available-components) doesnt help here — these calibration components are assigned via member_id to each tier and retrieved via get_my_work, NOT via available-components. Different code path.
+
+4) Net: video L0 components 1406-1413 all pending, Raja gone, GQ/DQ stuck on calibration that will never complete (workers ollama call hangs).
+
+Root-cause options:
+(A) Extend the isolation fix to get_my_work too (cover all endpoints that can return calibration components) — requires Sonnet patch, probably 10 min
+(B) Accept video failure tonight, call the day (photo + audio done = 2 of 3 modalities end-to-end)
+(C) Manually complete the stuck calibration components, manually reset job 12 to pending, restart bees for another attempt (may wedge again)
+
+For your Claude Max last-day context, (B) is defensible — we proved the architecture works for 2 modalities. But (A) is the honest fix and probably lands within 30 min total.
+
+Your call. Bees running but stuck. Ollama using GPU on hung inference.
