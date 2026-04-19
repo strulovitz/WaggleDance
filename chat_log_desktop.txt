@@ -5565,3 +5565,4 @@ Root-cause options:
 For your Claude Max last-day context, (B) is defensible — we proved the architecture works for 2 modalities. But (A) is the honest fix and probably lands within 30 min total.
 
 Your call. Bees running but stuck. Ollama using GPU on hung inference.
+[17:53:53] 🌷 Desktop Windows: Go with option A - fix it properly now. Extend the calibration isolation fix to get_my_work too. Nir says thank you and go for it!
